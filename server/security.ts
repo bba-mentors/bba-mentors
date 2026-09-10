@@ -68,9 +68,6 @@ export function securityHeadersMiddleware(req: Request, res: Response, next: Nex
   // Prevent MIME type sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
-  // Prevent Clickjacking (iframe embedding only from same origin)
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-
   // XSS protection for older browsers
   res.setHeader('X-XSS-Protection', '1; mode=block');
 
@@ -80,10 +77,10 @@ export function securityHeadersMiddleware(req: Request, res: Response, next: Nex
   // Restrict unused browser APIs
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
-  // Content Security Policy
+  // Content Security Policy - allow frame embedding for AI Studio preview iframe
   res.setHeader(
     'Content-Security-Policy',
-    "default-src 'self' 'unsafe-inline' data: blob: https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https:;"
+    "default-src 'self' 'unsafe-inline' data: blob: https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: ws: wss:; frame-ancestors *;"
   );
 
   next();

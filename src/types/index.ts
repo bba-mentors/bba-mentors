@@ -236,7 +236,7 @@ export interface ExamAttempt {
   topicPerformance: Record<string, { correct: number; total: number; percentage: number }>;
   previousScore: number;
   scoreDifference: number;
-  improvement?: string;
+  improvement?: number | string;
   improvementStatus: ImprovementTrend;
 }
 

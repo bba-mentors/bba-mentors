@@ -148,19 +148,28 @@ export function ExamEngineModal({
 
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
                 <span className="text-xs text-slate-500 block">Score Shift</span>
-                <span className={`text-2xl font-black mt-1 flex items-center justify-center gap-1 ${
-                  result.attempt.improvement >= 0 ? 'text-emerald-600' : 'text-amber-600'
-                }`}>
-                  {result.attempt.improvement >= 0 ? '+' : ''}
-                  {result.attempt.improvement}%
-                </span>
+                {(() => {
+                  const shift = typeof result.attempt.improvement === 'number'
+                    ? result.attempt.improvement
+                    : typeof result.attempt.scoreDifference === 'number'
+                    ? result.attempt.scoreDifference
+                    : Number(result.attempt.improvement) || 0;
+                  return (
+                    <span className={`text-2xl font-black mt-1 flex items-center justify-center gap-1 ${
+                      shift >= 0 ? 'text-emerald-600' : 'text-amber-600'
+                    }`}>
+                      {shift >= 0 ? '+' : ''}
+                      {shift}%
+                    </span>
+                  );
+                })()}
                 <span className="text-[10px] text-slate-400">vs Previous Exam</span>
               </div>
 
               <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-center">
                 <span className="text-xs text-slate-500 block">Accuracy</span>
                 <span className="text-2xl font-black text-emerald-700 mt-1 block">
-                  {result.attempt.correctAnswers} of {result.attempt.totalQuestions}
+                  {result.attempt.correctAnswers ?? result.attempt.correctCount} of {result.attempt.totalQuestions ?? (result.attempt.correctCount + result.attempt.wrongCount + result.attempt.skippedCount)}
                 </span>
               </div>
             </div>

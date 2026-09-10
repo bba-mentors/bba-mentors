@@ -497,7 +497,7 @@ export function ParentDashboard({ onNavigate }: ParentDashboardProps) {
 
               <div className="h-64 w-full pt-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={summary.trajectory}>
+                  <LineChart data={summary.weeklyScores || []}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
                     <XAxis dataKey="week" stroke="#64748b" fontSize={11} />
                     <YAxis domain={[50, 100]} stroke="#64748b" fontSize={11} />
@@ -665,24 +665,32 @@ export function ParentDashboard({ onNavigate }: ParentDashboardProps) {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100 text-slate-600">
-                      {examHistory.map((att) => (
-                        <tr key={att.id} className="hover:bg-slate-50/60">
-                          <td className="p-3 font-semibold text-slate-900">{att.examTitle}</td>
-                          <td className="p-3">{new Date(att.completedAt).toLocaleDateString()}</td>
-                          <td className="p-3 font-bold text-slate-900">
-                            {att.score} / {att.maxMarks}
-                          </td>
-                          <td className="p-3 font-bold text-blue-900">{att.percentage}%</td>
-                          <td className="p-3 font-bold">
-                            <span className={att.improvement >= 0 ? 'text-emerald-600' : 'text-amber-600'}>
-                              {att.improvement >= 0 ? '+' : ''}{att.improvement}%
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            {att.correctAnswers} of {att.totalQuestions}
-                          </td>
-                        </tr>
-                      ))}
+                      {examHistory.map((att) => {
+                        const shift = typeof att.improvement === 'number'
+                          ? att.improvement
+                          : typeof att.scoreDifference === 'number'
+                          ? att.scoreDifference
+                          : Number(att.improvement) || 0;
+                        const dateStr = att.completedAt || att.submittedAt;
+                        return (
+                          <tr key={att.id} className="hover:bg-slate-50/60">
+                            <td className="p-3 font-semibold text-slate-900">{att.examTitle || att.examName}</td>
+                            <td className="p-3">{dateStr ? new Date(dateStr).toLocaleDateString() : '-'}</td>
+                            <td className="p-3 font-bold text-slate-900">
+                              {att.score ?? att.marksObtained} / {att.maxMarks ?? att.totalMarks}
+                            </td>
+                            <td className="p-3 font-bold text-blue-900">{att.percentage}%</td>
+                            <td className="p-3 font-bold">
+                              <span className={shift >= 0 ? 'text-emerald-600' : 'text-amber-600'}>
+                                {shift >= 0 ? '+' : ''}{shift}%
+                              </span>
+                            </td>
+                            <td className="p-3">
+                              {att.correctAnswers ?? att.correctCount} of {att.totalQuestions ?? (att.correctCount + att.wrongCount + att.skippedCount)}
+                            </td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>
