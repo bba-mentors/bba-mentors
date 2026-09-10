@@ -1,0 +1,6 @@
+{
+  "name": "BBA Mentors",
+  "description": "Bihar-focused home tuition and student progress monitoring platform. Learn. Test. Improve.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
