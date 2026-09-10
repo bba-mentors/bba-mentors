@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { api } from '../../services/api.ts';
+import { ALL_38_BIHAR_DISTRICTS, TOTAL_BIHAR_DISTRICTS_COUNT } from '../../data/biharDistricts.ts';
 
 interface SupportProps {
   viewType: 'about' | 'contact' | 'faq' | 'privacy' | 'terms';
@@ -110,7 +111,7 @@ export function AboutContactFaqPage({ viewType, onNavigate }: SupportProps) {
                 "Learn. Test. Improve."
               </h2>
               <p className="text-xs sm:text-sm text-blue-100 max-w-2xl leading-relaxed">
-                By combining dedicated 1-on-1 mentorship with software-driven learning diagnostics, BBA Mentors empowers students across Patna, Gaya, Muzaffarpur, Bhagalpur, Darbhanga and all of Bihar to excel in their academic goals.
+                By combining dedicated 1-on-1 mentorship with software-driven learning diagnostics, BBA Mentors empowers students across all 38 districts of Bihar (all 9 divisions) to excel in their board and competitive academic goals.
               </p>
               <div className="pt-2 flex gap-3">
                 <button
@@ -157,7 +158,7 @@ export function AboutContactFaqPage({ viewType, onNavigate }: SupportProps) {
                     <Phone className="w-4 h-4 text-emerald-700" />
                     <span>Helpline Numbers</span>
                   </div>
-                  <p className="text-xs text-slate-600">Parent Counseling: +91 98000 11122</p>
+                  <p className="text-xs text-slate-600">Parent Counseling & WhatsApp: +91 9576767949</p>
                   <p className="text-xs text-slate-600">Patna Desk: 0612-2500001</p>
                   <p className="text-[11px] text-slate-400">Hours: Mon - Sun (8:00 AM to 9:00 PM)</p>
                 </div>
@@ -211,14 +212,18 @@ export function AboutContactFaqPage({ viewType, onNavigate }: SupportProps) {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-slate-700 mb-1">District</label>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">
+                          Bihar District ({TOTAL_BIHAR_DISTRICTS_COUNT})
+                        </label>
                         <select
                           value={contactForm.district}
                           onChange={(e) => setContactForm({ ...contactForm, district: e.target.value })}
                           className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                         >
-                          {['Patna', 'Gaya', 'Muzaffarpur', 'Bhagalpur', 'Darbhanga', 'Purnia', 'Begusarai', 'Bhojpur (Ara)'].map((d) => (
-                            <option key={d} value={d}>{d}</option>
+                          {ALL_38_BIHAR_DISTRICTS.map((d) => (
+                            <option key={d.id} value={d.name}>
+                              {d.name} {d.hindiName ? `(${d.hindiName})` : ''}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -282,6 +287,10 @@ export function AboutContactFaqPage({ viewType, onNavigate }: SupportProps) {
 
             <div className="space-y-3">
               {[
+                {
+                  q: 'Are your mentors active across all 38 districts of Bihar? (क्या आप बिहार के सभी 38 जिलों में सक्रिय हैं?)',
+                  a: 'हाँ! BBA Mentors बिहार के सभी 38 जिलों (Patna, Gaya, Muzaffarpur, Bhagalpur, Darbhanga, Purnia, Begusarai, Bhojpur, Nalanda, Siwan, Motihari, Katihar, Saharsa, Gopalganj, Sitamarhi, Rohtas, Aurangabad, Kishanganj आदि) और सभी 9 प्रमंडलों में 100% सक्रिय है। चाहे आप जिला मुख्यालय में रहते हों या ब्लॉक/तहसील स्तर पर, हमारे सत्यापित गृह शिक्षक (Home Tutors) एवं डिजिटल 1-on-1 मेंटर्स उपलब्ध हैं।',
+                },
                 {
                   q: 'How does BBA Mentors verify its tutors and mentors?',
                   a: 'Every mentor goes through a 3-step verification process: 1. Aadhaar and residential address background check. 2. Degree certificate verification from accredited institutions (NIT Patna, Patna Science College, Delhi University, etc.). 3. A mock demo class evaluation to check communication skills, patience, and subject clarity.',

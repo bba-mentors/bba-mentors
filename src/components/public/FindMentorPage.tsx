@@ -17,6 +17,8 @@ import {
 } from 'lucide-react';
 import { api } from '../../services/api.ts';
 import type { Mentor, BiharDistrict } from '../../types/index.ts';
+import { ALL_38_BIHAR_DISTRICTS } from '../../data/biharDistricts.ts';
+import { ALL_ACADEMIC_CLASSES } from '../../data/academicClasses.ts';
 
 interface FindMentorProps {
   onNavigate: (view: string, data?: any) => void;
@@ -25,7 +27,7 @@ interface FindMentorProps {
 
 export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
   const [mentors, setMentors] = useState<Mentor[]>([]);
-  const [districts, setDistricts] = useState<BiharDistrict[]>([]);
+  const [districts, setDistricts] = useState<BiharDistrict[]>(ALL_38_BIHAR_DISTRICTS);
   const [loading, setLoading] = useState(true);
 
   // Filter States
@@ -154,16 +156,18 @@ export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-1">
             {/* District Filter */}
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Bihar District</label>
+              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
+                Bihar District ({districts.length})
+              </label>
               <select
                 value={selectedDistrict}
                 onChange={(e) => setSelectedDistrict(e.target.value)}
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
               >
-                <option value="">All Districts</option>
+                <option value="">All Bihar (सभी 38 जिले)</option>
                 {districts.map((d) => (
-                  <option key={d.id} value={d.name}>
-                    {d.name} ({d.activeMentorsCount} mentors)
+                  <option key={d.id} value={d.name.split(' ')[0]}>
+                    {d.name} {d.hindiName ? `(${d.hindiName})` : ''} - {d.activeMentorsCount} Mentors
                   </option>
                 ))}
               </select>
@@ -192,8 +196,8 @@ export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
                 onChange={(e) => setSelectedClass(e.target.value)}
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
               >
-                <option value="">All Classes</option>
-                {['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((c) => (
+                <option value="">All Classes (Nursery to 12th)</option>
+                {ALL_ACADEMIC_CLASSES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
@@ -503,7 +507,7 @@ export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
                       onChange={(e) => setRequestForm({ ...requestForm, classGrade: e.target.value })}
                       className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                     >
-                      {['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((c) => (
+                      {ALL_ACADEMIC_CLASSES.map((c) => (
                         <option key={c} value={c}>{c}</option>
                       ))}
                     </select>

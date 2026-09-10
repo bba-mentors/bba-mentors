@@ -50,72 +50,329 @@ export function verifyPassword(password: string, hash: string, salt: string): bo
   return testHash === hash;
 }
 
-// Initial Bihar Districts
+// Initial Bihar Districts (All 38 Districts across 9 Administrative Divisions)
 const initialDistricts: BiharDistrict[] = [
+  // Patna Division
   {
     id: 'dist-patna',
     name: 'Patna',
     headquarters: 'Patna',
-    popularAreas: ['Kankarbagh', 'Boring Road', 'Rajendra Nagar', 'Bailey Road', 'Patliputra', 'Anisabad'],
-    pincodes: ['800020', '800001', '800013', '800023'],
-    activeMentorsCount: 42,
+    popularAreas: ['Boring Road', 'Kankarbagh', 'Bailey Road', 'Rajendra Nagar', 'Patliputra', 'Anisabad', 'Saguna More'],
+    pincodes: ['800001', '800020', '800013', '800023'],
+    activeMentorsCount: 48,
   },
   {
-    id: 'dist-gaya',
-    name: 'Gaya',
-    headquarters: 'Gaya',
-    popularAreas: ['Civil Lines', 'AP Colony', 'Chand Chaura', 'Rampur', 'Delha'],
-    pincodes: ['823001', '823002', '823003'],
-    activeMentorsCount: 18,
+    id: 'dist-nalanda',
+    name: 'Nalanda (Bihar Sharif)',
+    headquarters: 'Bihar Sharif',
+    popularAreas: ['Hospital Road', 'Ramchandrapur', 'Ranchi Road', 'Khandak Par', 'Sohsarai', 'Rajgir'],
+    pincodes: ['803101', '803118'],
+    activeMentorsCount: 19,
   },
+  {
+    id: 'dist-bhojpur',
+    name: 'Bhojpur (Ara)',
+    headquarters: 'Ara',
+    popularAreas: ['Nawada', 'Katira', 'Anaith', 'Dharhara', 'Chandwa', 'Jagdeo Nagar', 'Sheoganj'],
+    pincodes: ['802301'],
+    activeMentorsCount: 16,
+  },
+  {
+    id: 'dist-buxar',
+    name: 'Buxar',
+    headquarters: 'Buxar',
+    popularAreas: ['Station Road', 'Civil Lines', 'Charitravan', 'Golambar', 'Piparpanti Road'],
+    pincodes: ['802101'],
+    activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-rohtas',
+    name: 'Rohtas (Sasaram)',
+    headquarters: 'Sasaram',
+    popularAreas: ['Fazalganj', 'Dharamsala Road', 'Gaurakshani', 'Old GT Road', 'Dehri on Sone'],
+    pincodes: ['821115', '821307'],
+    activeMentorsCount: 14,
+  },
+  {
+    id: 'dist-kaimur',
+    name: 'Kaimur (Bhabua)',
+    headquarters: 'Bhabua',
+    popularAreas: ['Collectorate Road', 'Ekta Chowk', 'Mohania Market', 'Kudra'],
+    pincodes: ['821101'],
+    activeMentorsCount: 9,
+  },
+
+  // Tirhut Division
   {
     id: 'dist-muzaffarpur',
     name: 'Muzaffarpur',
     headquarters: 'Muzaffarpur',
-    popularAreas: ['Mithanpura', 'Club Road', 'Kalambagh Chowk', 'Brahmpura', 'Juran Chapra'],
+    popularAreas: ['Mithanpura', 'Club Road', 'Kalambagh Chowk', 'Brahmpura', 'Juran Chapra', 'Aghoria Bazar'],
     pincodes: ['842001', '842002', '842003'],
-    activeMentorsCount: 24,
+    activeMentorsCount: 32,
   },
   {
-    id: 'dist-bhagalpur',
-    name: 'Bhagalpur',
-    headquarters: 'Bhagalpur',
-    popularAreas: ['Adampur', 'Tilkamanjhi', 'Zero Mile', 'Khanjarpur', 'Barari'],
-    pincodes: ['812001', '812002'],
+    id: 'dist-east-champaran',
+    name: 'East Champaran (Motihari)',
+    headquarters: 'Motihari',
+    popularAreas: ['Chhatauni', 'Main Road', 'Janpul Chowk', 'Balua Tal', 'Raja Bazar'],
+    pincodes: ['845401'],
     activeMentorsCount: 15,
   },
+  {
+    id: 'dist-west-champaran',
+    name: 'West Champaran (Bettiah)',
+    headquarters: 'Bettiah',
+    popularAreas: ['Kamalnath Nagar', 'Lal Bazar', 'Hospital Road', 'Narkatiaganj'],
+    pincodes: ['845438'],
+    activeMentorsCount: 13,
+  },
+  {
+    id: 'dist-sitamarhi',
+    name: 'Sitamarhi',
+    headquarters: 'Sitamarhi',
+    popularAreas: ['Mehshoul Chowk', 'Dumra Road', 'Bhavdepur', 'Court Bazar'],
+    pincodes: ['843301'],
+    activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-sheohar',
+    name: 'Sheohar',
+    headquarters: 'Sheohar',
+    popularAreas: ['Main Market', 'Collectorate Colony', 'Zero Mile', 'Kalyanpur'],
+    pincodes: ['843329'],
+    activeMentorsCount: 8,
+  },
+  {
+    id: 'dist-vaishali',
+    name: 'Vaishali (Hajipur)',
+    headquarters: 'Hajipur',
+    popularAreas: ['Cinema Road', 'Anwarpur', 'Bagmali', 'Rajendra Chowk', 'Paswan Chowk'],
+    pincodes: ['844101'],
+    activeMentorsCount: 18,
+  },
+
+  // Saran Division
+  {
+    id: 'dist-saran',
+    name: 'Saran (Chhapra)',
+    headquarters: 'Chhapra',
+    popularAreas: ['Gudri Bazar', 'Dahiyawan', 'Prabhunath Nagar', 'Kashi Bazar', 'Bhagwan Bazar'],
+    pincodes: ['841301'],
+    activeMentorsCount: 17,
+  },
+  {
+    id: 'dist-siwan',
+    name: 'Siwan',
+    headquarters: 'Siwan',
+    popularAreas: ['Hospital Road', 'Fathepur', 'Naya Bazar', 'Mahadeva', 'Tarwara Road'],
+    pincodes: ['841226'],
+    activeMentorsCount: 14,
+  },
+  {
+    id: 'dist-gopalganj',
+    name: 'Gopalganj',
+    headquarters: 'Gopalganj',
+    popularAreas: ['Banjari Road', 'Main Market', 'Sarkari Hatha', 'Mirganj', 'Thawe'],
+    pincodes: ['841428'],
+    activeMentorsCount: 12,
+  },
+
+  // Darbhanga Division
   {
     id: 'dist-darbhanga',
     name: 'Darbhanga',
     headquarters: 'Darbhanga',
-    popularAreas: ['Laheriasarai', 'Donar', 'Mirzapur', 'Benta', 'Allalpatti'],
+    popularAreas: ['Laheriasarai', 'Donar', 'Mirzapur', 'Benta', 'Allalpatti', 'Tower Chowk'],
     pincodes: ['846001', '846003', '846004'],
-    activeMentorsCount: 16,
+    activeMentorsCount: 22,
   },
+  {
+    id: 'dist-madhubani',
+    name: 'Madhubani',
+    headquarters: 'Madhubani',
+    popularAreas: ['Suratganj', 'Ganga Sagar Chowk', 'Bazar Samiti', 'Sapta', 'Jhanjharpur'],
+    pincodes: ['847211'],
+    activeMentorsCount: 15,
+  },
+  {
+    id: 'dist-samastipur',
+    name: 'Samastipur',
+    headquarters: 'Samastipur',
+    popularAreas: ['Mohanpur Road', 'Kashipur', 'Tajpur Road', 'Magadh Dairy Area', 'Station Road'],
+    pincodes: ['848101'],
+    activeMentorsCount: 18,
+  },
+
+  // Kosi Division
+  {
+    id: 'dist-saharsa',
+    name: 'Saharsa',
+    headquarters: 'Saharsa',
+    popularAreas: ['D.B. Road', 'Gangjala', 'Hatia Gachhi', 'Tiwari Tola', 'Bangaon Road'],
+    pincodes: ['852201'],
+    activeMentorsCount: 13,
+  },
+  {
+    id: 'dist-madhepura',
+    name: 'Madhepura',
+    headquarters: 'Madhepura',
+    popularAreas: ['College Chowk', 'Main Market', 'B.P. Mandal Chowk', 'Singheshwar'],
+    pincodes: ['852113'],
+    activeMentorsCount: 10,
+  },
+  {
+    id: 'dist-supaul',
+    name: 'Supaul',
+    headquarters: 'Supaul',
+    popularAreas: ['Station Road', 'Gandhi Maidan Area', 'Lohia Nagar', 'Kisan Chowk'],
+    pincodes: ['852131'],
+    activeMentorsCount: 10,
+  },
+
+  // Purnia Division
   {
     id: 'dist-purnia',
     name: 'Purnia',
     headquarters: 'Purnia',
-    popularAreas: ['Line Bazar', 'Bhatta Bazar', 'Navratan Hatta', 'Madhubani'],
+    popularAreas: ['Line Bazar', 'Bhatta Bazar', 'Navratan Hatta', 'Madhubani', 'Gulabbagh'],
     pincodes: ['854301', '854302'],
+    activeMentorsCount: 20,
+  },
+  {
+    id: 'dist-katihar',
+    name: 'Katihar',
+    headquarters: 'Katihar',
+    popularAreas: ['Mirchaibari', 'Bada Bazar', 'Mangal Bazar', 'Tindgachhiya', 'Ambedkar Chowk'],
+    pincodes: ['854105'],
+    activeMentorsCount: 14,
+  },
+  {
+    id: 'dist-araria',
+    name: 'Araria',
+    headquarters: 'Araria',
+    popularAreas: ['Zero Mile', 'Bus Stand Road', 'Om Nagar', 'Forbesganj Main Road'],
+    pincodes: ['854311'],
     activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-kishanganj',
+    name: 'Kishanganj',
+    headquarters: 'Kishanganj',
+    popularAreas: ['Hospital Road', 'Caltex Chowk', 'Line Mohalla', 'Dharamganj', 'Paschim Palli'],
+    pincodes: ['855107'],
+    activeMentorsCount: 10,
+  },
+
+  // Bhagalpur Division
+  {
+    id: 'dist-bhagalpur',
+    name: 'Bhagalpur',
+    headquarters: 'Bhagalpur',
+    popularAreas: ['Adampur', 'Tilkamanjhi', 'Zero Mile', 'Khanjarpur', 'Barari', 'Aliganj'],
+    pincodes: ['812001', '812002'],
+    activeMentorsCount: 26,
+  },
+  {
+    id: 'dist-banka',
+    name: 'Banka',
+    headquarters: 'Banka',
+    popularAreas: ['Shivaji Chowk', 'Katoria Road', 'Chandan Bazar', 'Amarpur Road'],
+    pincodes: ['813102'],
+    activeMentorsCount: 9,
+  },
+
+  // Munger Division
+  {
+    id: 'dist-munger',
+    name: 'Munger',
+    headquarters: 'Munger',
+    popularAreas: ['Fort Area', 'Belan Bazar', 'Kashim Bazar', 'Bari Bazar', 'Jamalpur Railway Colony'],
+    pincodes: ['811201', '811214'],
+    activeMentorsCount: 15,
+  },
+  {
+    id: 'dist-jamui',
+    name: 'Jamui',
+    headquarters: 'Jamui',
+    popularAreas: ['Bodham Talab', 'Station Road', 'Maharajganj', 'Giddhaur Road', 'Jhajha'],
+    pincodes: ['811307'],
+    activeMentorsCount: 10,
+  },
+  {
+    id: 'dist-khagaria',
+    name: 'Khagaria',
+    headquarters: 'Khagaria',
+    popularAreas: ['Rajendra Chowk', 'Station Road', 'Baluahi', 'Sanjivani Nagar'],
+    pincodes: ['851204'],
+    activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-lakhisarai',
+    name: 'Lakhisarai',
+    headquarters: 'Lakhisarai',
+    popularAreas: ['Vidyapeeth Chowk', 'Purani Bazar', 'Naya Bazar', 'Barahiya Road'],
+    pincodes: ['811311'],
+    activeMentorsCount: 10,
   },
   {
     id: 'dist-begusarai',
     name: 'Begusarai',
     headquarters: 'Begusarai',
-    popularAreas: ['Harrakh', 'Kharhat', 'Lakhminia', 'Teghra'],
+    popularAreas: ['Har-Har Mahadev Chowk', 'Kali Sthan', 'Refinery Township', 'Bishanpur', 'Subhash Chowk'],
     pincodes: ['851101'],
-    activeMentorsCount: 9,
+    activeMentorsCount: 21,
   },
   {
-    id: 'dist-ara',
-    name: 'Bhojpur (Ara)',
-    headquarters: 'Ara',
-    popularAreas: ['Nawada', 'Katira', 'Anaith', 'Dharhara'],
-    pincodes: ['802301'],
+    id: 'dist-sheikhpura',
+    name: 'Sheikhpura',
+    headquarters: 'Sheikhpura',
+    popularAreas: ['Station Road', 'Khandpar', 'Hussainabad', 'Barbigha Bazar'],
+    pincodes: ['811105'],
     activeMentorsCount: 8,
-  }
+  },
+
+  // Magadh Division
+  {
+    id: 'dist-gaya',
+    name: 'Gaya',
+    headquarters: 'Gaya',
+    popularAreas: ['Civil Lines', 'AP Colony', 'Chand Chaura', 'Rampur', 'Delha', 'Bodh Gaya'],
+    pincodes: ['823001', '823002', '823003'],
+    activeMentorsCount: 28,
+  },
+  {
+    id: 'dist-aurangabad',
+    name: 'Aurangabad',
+    headquarters: 'Aurangabad',
+    popularAreas: ['Ramesh Chowk', 'GT Road Area', 'Maharajganj', 'Dani Bigha', 'Daudnagar'],
+    pincodes: ['824101'],
+    activeMentorsCount: 13,
+  },
+  {
+    id: 'dist-nawada',
+    name: 'Nawada',
+    headquarters: 'Nawada',
+    popularAreas: ['Main Road', 'Gola Road', 'Parsawan', 'Hisua', 'Rajauli'],
+    pincodes: ['805110'],
+    activeMentorsCount: 12,
+  },
+  {
+    id: 'dist-jehanabad',
+    name: 'Jehanabad',
+    headquarters: 'Jehanabad',
+    popularAreas: ['Court Area', 'Hospital More', 'Station Road', 'Mallikana', 'Makhdumpur'],
+    pincodes: ['804408'],
+    activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-arwal',
+    name: 'Arwal',
+    headquarters: 'Arwal',
+    popularAreas: ['Main Chowk', 'Collectorate Area', 'Son River Road', 'Kurtha'],
+    pincodes: ['804401'],
+    activeMentorsCount: 7,
+  },
 ];
 
 // Initialize Database with realistic data
@@ -145,7 +402,7 @@ export function createSeedData(): Database {
     email: 'admin@bbamentors.com',
     role: 'ADMIN',
     name: 'BBA Mentors Academic Director',
-    mobile: '9800011122',
+    mobile: '9576767949',
     city: 'Patna',
     district: 'Patna',
     state: 'Bihar',
@@ -316,8 +573,8 @@ export function createSeedData(): Database {
     qualification: 'M.Sc. Zoology (Gold Medalist), B.Ed',
     college: 'Patna Science College, Patna University',
     teachingExperience: '4+ Years',
-    subjects: ['Science', 'Biology', 'Hindi', 'English'],
-    classes: ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'],
+    subjects: ['Science', 'Biology', 'Hindi', 'English', 'Foundational Reading'],
+    classes: ['Nursery', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'],
     boards: ['BSEB', 'CBSE'],
     preferredAreas: ['Patliputra', 'Boring Road', 'Kankarbagh', 'Anisabad'],
     district: 'Patna',
@@ -451,8 +708,8 @@ export function createSeedData(): Database {
     qualification: 'M.A. English & Social Studies',
     college: 'TMBU Bhagalpur',
     teachingExperience: '3+ Years',
-    subjects: ['English', 'Social Science', 'Hindi'],
-    classes: ['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'],
+    subjects: ['English', 'Social Science', 'Hindi', 'Handwriting & Phonics'],
+    classes: ['Nursery', 'LKG', 'UKG', 'Class 1', 'Class 2', 'Class 3', 'Class 4', 'Class 5', 'Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10'],
     boards: ['CBSE', 'BSEB'],
     preferredAreas: ['Adampur', 'Tilkamanjhi'],
     district: 'Bhagalpur',
@@ -995,7 +1252,12 @@ export function createSeedData(): Database {
     ],
   };
 
-  db.weeklyExams.push(examWeek1, examWeek2, examWeek3, examWeek4, examWeek5);
+  [examWeek1, examWeek2, examWeek3, examWeek4, examWeek5].forEach((exam) => {
+    exam.title = exam.title || exam.examName;
+    exam.chapterName = exam.chapterName || exam.chapter;
+    exam.topicsCovered = exam.topicsCovered || exam.topics;
+    db.weeklyExams.push(exam);
+  });
 
   // 7. Historical Exam Attempts for Aarav Sharma (Showing real progression: 65% -> 69% -> 72% -> 76% -> 81%)
   // Week 1 attempt: 13 / 20 = 65%
@@ -1421,6 +1683,13 @@ export function getStudentProgressSummary(studentId: string): StudentProgressSum
 
   const upcomingExam = dbInstance.weeklyExams.find((e) => e.status === 'Published');
 
+  const subjectBreakdown = Object.entries(subjectPerformance).map(([subject, score]) => ({
+    subject,
+    score,
+  }));
+
+  const latestWeeklyScore = weeklyScores.length > 0 ? weeklyScores[weeklyScores.length - 1].score : overallScore;
+
   return {
     studentId: student.id,
     studentName: student.name,
@@ -1431,13 +1700,17 @@ export function getStudentProgressSummary(studentId: string): StudentProgressSum
     attendancePercentage,
     totalClasses: totalClasses > 0 ? totalClasses : 12,
     completedClasses: presentCount > 0 ? presentCount : 10,
+    attendedClasses: presentCount > 0 ? presentCount : 10,
     testsTaken: attempts.length > 0 ? attempts.length : 5,
+    weeklyScore: latestWeeklyScore,
     subjectPerformance,
+    subjectBreakdown,
     weeklyScores,
     strongTopics: strongTopics.slice(0, 4),
     weakTopics: weakTopics.slice(0, 3),
     latestMentorRemarks,
     bbaRecommendations,
+    recommendations: bbaRecommendations,
     upcomingExam: upcomingExam
       ? {
           id: upcomingExam.id,

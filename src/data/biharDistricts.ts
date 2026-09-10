@@ -1,0 +1,471 @@
+import type { BiharDistrict } from '../types/index.ts';
+
+export interface BiharDivision {
+  name: string;
+  hindiName: string;
+  districts: string[];
+}
+
+export const BIHAR_DIVISIONS: BiharDivision[] = [
+  {
+    name: 'Patna Division',
+    hindiName: 'पटना प्रमंडल',
+    districts: ['Patna', 'Nalanda (Bihar Sharif)', 'Bhojpur (Ara)', 'Buxar', 'Rohtas (Sasaram)', 'Kaimur (Bhabua)'],
+  },
+  {
+    name: 'Tirhut Division',
+    hindiName: 'तिरहुत प्रमंडल',
+    districts: ['Muzaffarpur', 'East Champaran (Motihari)', 'West Champaran (Bettiah)', 'Sitamarhi', 'Sheohar', 'Vaishali (Hajipur)'],
+  },
+  {
+    name: 'Saran Division',
+    hindiName: 'सारण प्रमंडल',
+    districts: ['Saran (Chhapra)', 'Siwan', 'Gopalganj'],
+  },
+  {
+    name: 'Darbhanga Division',
+    hindiName: 'दरभंगा प्रमंडल',
+    districts: ['Darbhanga', 'Madhubani', 'Samastipur'],
+  },
+  {
+    name: 'Kosi Division',
+    hindiName: 'कोशी प्रमंडल',
+    districts: ['Saharsa', 'Madhepura', 'Supaul'],
+  },
+  {
+    name: 'Purnia Division',
+    hindiName: 'पूर्णिया प्रमंडल',
+    districts: ['Purnia', 'Katihar', 'Araria', 'Kishanganj'],
+  },
+  {
+    name: 'Bhagalpur Division',
+    hindiName: 'भागलपुर प्रमंडल',
+    districts: ['Bhagalpur', 'Banka'],
+  },
+  {
+    name: 'Munger Division',
+    hindiName: 'मुंगेर प्रमंडल',
+    districts: ['Munger', 'Jamui', 'Khagaria', 'Lakhisarai', 'Begusarai', 'Sheikhpura'],
+  },
+  {
+    name: 'Magadh Division',
+    hindiName: 'मगध प्रमंडल',
+    districts: ['Gaya', 'Aurangabad', 'Nawada', 'Jehanabad', 'Arwal'],
+  },
+];
+
+export const ALL_38_BIHAR_DISTRICTS: BiharDistrict[] = [
+  // 1. Patna Division (6 Districts)
+  {
+    id: 'dist-patna',
+    name: 'Patna',
+    hindiName: 'पटना',
+    division: 'Patna Division',
+    headquarters: 'Patna',
+    popularAreas: ['Boring Road', 'Kankarbagh', 'Bailey Road', 'Rajendra Nagar', 'Patliputra', 'Anisabad', 'Saguna More', 'Ashok Nagar'],
+    pincodes: ['800001', '800020', '800013', '800016', '800023'],
+    activeMentorsCount: 48,
+  },
+  {
+    id: 'dist-nalanda',
+    name: 'Nalanda (Bihar Sharif)',
+    hindiName: 'नालंदा (बिहार शरीफ)',
+    division: 'Patna Division',
+    headquarters: 'Bihar Sharif',
+    popularAreas: ['Hospital Road', 'Ramchandrapur', 'Ranchi Road', 'Khandak Par', 'Sohsarai', 'Rajgir'],
+    pincodes: ['803101', '803118', '803116'],
+    activeMentorsCount: 19,
+  },
+  {
+    id: 'dist-bhojpur',
+    name: 'Bhojpur (Ara)',
+    hindiName: 'भोजपुर (आरा)',
+    division: 'Patna Division',
+    headquarters: 'Ara',
+    popularAreas: ['Nawada', 'Katira', 'Anaith', 'Dharhara', 'Chandwa', 'Jagdeo Nagar', 'Sheoganj'],
+    pincodes: ['802301', '802302'],
+    activeMentorsCount: 16,
+  },
+  {
+    id: 'dist-buxar',
+    name: 'Buxar',
+    hindiName: 'बक्सर',
+    division: 'Patna Division',
+    headquarters: 'Buxar',
+    popularAreas: ['Station Road', 'Civil Lines', 'Charitravan', 'Golambar', 'Piparpanti Road'],
+    pincodes: ['802101', '802103'],
+    activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-rohtas',
+    name: 'Rohtas (Sasaram)',
+    hindiName: 'रोहतास (सासाराम)',
+    division: 'Patna Division',
+    headquarters: 'Sasaram',
+    popularAreas: ['Fazalganj', 'Dharamsala Road', 'Gaurakshani', 'Old GT Road', 'Dehri on Sone'],
+    pincodes: ['821115', '821307'],
+    activeMentorsCount: 14,
+  },
+  {
+    id: 'dist-kaimur',
+    name: 'Kaimur (Bhabua)',
+    hindiName: 'कैमूर (भभुआ)',
+    division: 'Patna Division',
+    headquarters: 'Bhabua',
+    popularAreas: ['Collectorate Road', 'Ekta Chowk', 'Ward No 12', 'Mohania Market', 'Kudra'],
+    pincodes: ['821101', '821109'],
+    activeMentorsCount: 9,
+  },
+
+  // 2. Tirhut Division (6 Districts)
+  {
+    id: 'dist-muzaffarpur',
+    name: 'Muzaffarpur',
+    hindiName: 'मुजफ्फरपुर',
+    division: 'Tirhut Division',
+    headquarters: 'Muzaffarpur',
+    popularAreas: ['Mithanpura', 'Club Road', 'Kalambagh Chowk', 'Brahmpura', 'Juran Chapra', 'Aghoria Bazar', 'Govindpur'],
+    pincodes: ['842001', '842002', '842003'],
+    activeMentorsCount: 32,
+  },
+  {
+    id: 'dist-east-champaran',
+    name: 'East Champaran (Motihari)',
+    hindiName: 'पूर्वी चंपारण (मोतिहारी)',
+    division: 'Tirhut Division',
+    headquarters: 'Motihari',
+    popularAreas: ['Chhatauni', 'Main Road', 'Janpul Chowk', 'Balua Tal', 'Dharampur', 'Raja Bazar'],
+    pincodes: ['845401', '845402'],
+    activeMentorsCount: 15,
+  },
+  {
+    id: 'dist-west-champaran',
+    name: 'West Champaran (Bettiah)',
+    hindiName: 'पश्चिम चंपारण (बेतिया)',
+    division: 'Tirhut Division',
+    headquarters: 'Bettiah',
+    popularAreas: ['Kamalnath Nagar', 'Lal Bazar', 'Hospital Road', 'Ujjain Tola', 'Narkatiaganj'],
+    pincodes: ['845438', '845455'],
+    activeMentorsCount: 13,
+  },
+  {
+    id: 'dist-sitamarhi',
+    name: 'Sitamarhi',
+    hindiName: 'सीतामढ़ी',
+    division: 'Tirhut Division',
+    headquarters: 'Sitamarhi',
+    popularAreas: ['Mehshoul Chowk', 'Dumra Road', 'Bhavdepur', 'Court Bazar', 'Riga Road'],
+    pincodes: ['843301', '843302'],
+    activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-sheohar',
+    name: 'Sheohar',
+    hindiName: 'शिवहर',
+    division: 'Tirhut Division',
+    headquarters: 'Sheohar',
+    popularAreas: ['Main Market', 'Collectorate Colony', 'Zero Mile', 'Kalyanpur', 'Purnahiya'],
+    pincodes: ['843329'],
+    activeMentorsCount: 8,
+  },
+  {
+    id: 'dist-vaishali',
+    name: 'Vaishali (Hajipur)',
+    hindiName: 'वैशाली (हाजीपुर)',
+    division: 'Tirhut Division',
+    headquarters: 'Hajipur',
+    popularAreas: ['Cinema Road', 'Anwarpur', 'Bagmali', 'Rajendra Chowk', 'Paswan Chowk', 'Lalganj'],
+    pincodes: ['844101', '844102'],
+    activeMentorsCount: 18,
+  },
+
+  // 3. Saran Division (3 Districts)
+  {
+    id: 'dist-saran',
+    name: 'Saran (Chhapra)',
+    hindiName: 'सारण (छपरा)',
+    division: 'Saran Division',
+    headquarters: 'Chhapra',
+    popularAreas: ['Gudri Bazar', 'Dahiyawan', 'Prabhunath Nagar', 'Kashi Bazar', 'Bhagwan Bazar', 'Sonauli'],
+    pincodes: ['841301', '841302'],
+    activeMentorsCount: 17,
+  },
+  {
+    id: 'dist-siwan',
+    name: 'Siwan',
+    hindiName: 'सिवान',
+    division: 'Saran Division',
+    headquarters: 'Siwan',
+    popularAreas: ['Hospital Road', 'Fathepur', 'Naya Bazar', 'Mahadeva', 'Tarwara Road', 'Mairwa'],
+    pincodes: ['841226', '841227'],
+    activeMentorsCount: 14,
+  },
+  {
+    id: 'dist-gopalganj',
+    name: 'Gopalganj',
+    hindiName: 'गोपालगंज',
+    division: 'Saran Division',
+    headquarters: 'Gopalganj',
+    popularAreas: ['Banjari Road', 'Main Market', 'Sarkari Hatha', 'Yadopur Road', 'Mirganj', 'Thawe'],
+    pincodes: ['841428', '841438'],
+    activeMentorsCount: 12,
+  },
+
+  // 4. Darbhanga Division (3 Districts)
+  {
+    id: 'dist-darbhanga',
+    name: 'Darbhanga',
+    hindiName: 'दरभंगा',
+    division: 'Darbhanga Division',
+    headquarters: 'Darbhanga',
+    popularAreas: ['Laheriasarai', 'Donar', 'Mirzapur', 'Benta', 'Allalpatti', 'Tower Chowk', 'Kathalbari'],
+    pincodes: ['846001', '846003', '846004'],
+    activeMentorsCount: 22,
+  },
+  {
+    id: 'dist-madhubani',
+    name: 'Madhubani',
+    hindiName: 'मधुबनी',
+    division: 'Darbhanga Division',
+    headquarters: 'Madhubani',
+    popularAreas: ['Suratganj', 'Ganga Sagar Chowk', 'Bazar Samiti', 'Sapta', 'Pandariba', 'Jhanjharpur'],
+    pincodes: ['847211', '847212'],
+    activeMentorsCount: 15,
+  },
+  {
+    id: 'dist-samastipur',
+    name: 'Samastipur',
+    hindiName: 'समस्तीपुर',
+    division: 'Darbhanga Division',
+    headquarters: 'Samastipur',
+    popularAreas: ['Mohanpur Road', 'Kashipur', 'Tajpur Road', 'Magadh Dairy Area', 'Station Road', 'Dalsinghsarai'],
+    pincodes: ['848101', '848102'],
+    activeMentorsCount: 18,
+  },
+
+  // 5. Kosi Division (3 Districts)
+  {
+    id: 'dist-saharsa',
+    name: 'Saharsa',
+    hindiName: 'सहरसा',
+    division: 'Kosi Division',
+    headquarters: 'Saharsa',
+    popularAreas: ['D.B. Road', 'Gangjala', 'Hatia Gachhi', 'Tiwari Tola', 'Bangaon Road'],
+    pincodes: ['852201'],
+    activeMentorsCount: 13,
+  },
+  {
+    id: 'dist-madhepura',
+    name: 'Madhepura',
+    hindiName: 'मधेपुरा',
+    division: 'Kosi Division',
+    headquarters: 'Madhepura',
+    popularAreas: ['College Chowk', 'Main Market', 'B.P. Mandal Chowk', 'Shankerpur Road', 'Singheshwar'],
+    pincodes: ['852113'],
+    activeMentorsCount: 10,
+  },
+  {
+    id: 'dist-supaul',
+    name: 'Supaul',
+    hindiName: 'सुपौल',
+    division: 'Kosi Division',
+    headquarters: 'Supaul',
+    popularAreas: ['Station Road', 'Gandhi Maidan Area', 'Lohia Nagar', 'Kisan Chowk', 'Triveniganj'],
+    pincodes: ['852131'],
+    activeMentorsCount: 10,
+  },
+
+  // 6. Purnia Division (4 Districts)
+  {
+    id: 'dist-purnia',
+    name: 'Purnia',
+    hindiName: 'पूर्णिया',
+    division: 'Purnia Division',
+    headquarters: 'Purnia',
+    popularAreas: ['Line Bazar', 'Bhatta Bazar', 'Navratan Hatta', 'Madhubani', 'Gulabbagh', 'Polytechnic Chowk'],
+    pincodes: ['854301', '854302'],
+    activeMentorsCount: 20,
+  },
+  {
+    id: 'dist-katihar',
+    name: 'Katihar',
+    hindiName: 'कटिहार',
+    division: 'Purnia Division',
+    headquarters: 'Katihar',
+    popularAreas: ['Mirchaibari', 'Bada Bazar', 'Mangal Bazar', 'Tindgachhiya', 'Ambedkar Chowk', 'Manihari'],
+    pincodes: ['854105', '854106'],
+    activeMentorsCount: 14,
+  },
+  {
+    id: 'dist-araria',
+    name: 'Araria',
+    hindiName: 'अररिया',
+    division: 'Purnia Division',
+    headquarters: 'Araria',
+    popularAreas: ['Zero Mile', 'Bus Stand Road', 'Om Nagar', 'Forbesganj Main Road', 'Jogbani'],
+    pincodes: ['854311', '854318'],
+    activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-kishanganj',
+    name: 'Kishanganj',
+    hindiName: 'किशनगंज',
+    division: 'Purnia Division',
+    headquarters: 'Kishanganj',
+    popularAreas: ['Hospital Road', 'Caltex Chowk', 'Line Mohalla', 'Dharamganj', 'Paschim Palli', 'Bahadurganj'],
+    pincodes: ['855107', '855108'],
+    activeMentorsCount: 10,
+  },
+
+  // 7. Bhagalpur Division (2 Districts)
+  {
+    id: 'dist-bhagalpur',
+    name: 'Bhagalpur',
+    hindiName: 'भागलपुर',
+    division: 'Bhagalpur Division',
+    headquarters: 'Bhagalpur',
+    popularAreas: ['Adampur', 'Tilkamanjhi', 'Zero Mile', 'Khanjarpur', 'Barari', 'Aliganj', 'Nathnagar'],
+    pincodes: ['812001', '812002', '812007'],
+    activeMentorsCount: 26,
+  },
+  {
+    id: 'dist-banka',
+    name: 'Banka',
+    hindiName: 'बांका',
+    division: 'Bhagalpur Division',
+    headquarters: 'Banka',
+    popularAreas: ['Shivaji Chowk', 'Katoria Road', 'Chandan Bazar', 'Amarpur Road', 'Barahat'],
+    pincodes: ['813102'],
+    activeMentorsCount: 9,
+  },
+
+  // 8. Munger Division (6 Districts)
+  {
+    id: 'dist-munger',
+    name: 'Munger',
+    hindiName: 'मुंगेर',
+    division: 'Munger Division',
+    headquarters: 'Munger',
+    popularAreas: ['Fort Area', 'Belan Bazar', 'Kashim Bazar', 'Bari Bazar', 'Jamalpur Railway Colony'],
+    pincodes: ['811201', '811214'],
+    activeMentorsCount: 15,
+  },
+  {
+    id: 'dist-jamui',
+    name: 'Jamui',
+    hindiName: 'जमुई',
+    division: 'Munger Division',
+    headquarters: 'Jamui',
+    popularAreas: ['Bodham Talab', 'Station Road', 'Maharajganj', 'Giddhaur Road', 'Jhajha'],
+    pincodes: ['811307', '811308'],
+    activeMentorsCount: 10,
+  },
+  {
+    id: 'dist-khagaria',
+    name: 'Khagaria',
+    hindiName: 'खगड़िया',
+    division: 'Munger Division',
+    headquarters: 'Khagaria',
+    popularAreas: ['Rajendra Chowk', 'Station Road', 'Baluahi', 'Sanjivani Nagar', 'Gogri Jamalpur'],
+    pincodes: ['851204', '851205'],
+    activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-lakhisarai',
+    name: 'Lakhisarai',
+    hindiName: 'लखीसराय',
+    division: 'Munger Division',
+    headquarters: 'Lakhisarai',
+    popularAreas: ['Vidyapeeth Chowk', 'Purani Bazar', 'Naya Bazar', 'Barahiya Road', 'Surajgarha'],
+    pincodes: ['811311'],
+    activeMentorsCount: 10,
+  },
+  {
+    id: 'dist-begusarai',
+    name: 'Begusarai',
+    hindiName: 'बेगूसराय',
+    division: 'Munger Division',
+    headquarters: 'Begusarai',
+    popularAreas: ['Har-Har Mahadev Chowk', 'Kali Sthan', 'Refinery Township', 'Bishanpur', 'Subhash Chowk', 'Teghra'],
+    pincodes: ['851101', '851117'],
+    activeMentorsCount: 21,
+  },
+  {
+    id: 'dist-sheikhpura',
+    name: 'Sheikhpura',
+    hindiName: 'शेखपुरा',
+    division: 'Munger Division',
+    headquarters: 'Sheikhpura',
+    popularAreas: ['Station Road', 'Khandpar', 'Hussainabad', 'Barbigha Bazar', 'Chewara'],
+    pincodes: ['811105'],
+    activeMentorsCount: 8,
+  },
+
+  // 9. Magadh Division (5 Districts)
+  {
+    id: 'dist-gaya',
+    name: 'Gaya',
+    hindiName: 'गया',
+    division: 'Magadh Division',
+    headquarters: 'Gaya',
+    popularAreas: ['Civil Lines', 'AP Colony', 'Chand Chaura', 'Rampur', 'Delha', 'Bodh Gaya', 'Medical College Road'],
+    pincodes: ['823001', '823002', '823003', '824231'],
+    activeMentorsCount: 28,
+  },
+  {
+    id: 'dist-aurangabad',
+    name: 'Aurangabad',
+    hindiName: 'औरंगाबाद',
+    division: 'Magadh Division',
+    headquarters: 'Aurangabad',
+    popularAreas: ['Ramesh Chowk', 'GT Road Area', 'Maharajganj', 'Dani Bigha', 'Daudnagar'],
+    pincodes: ['824101', '824102'],
+    activeMentorsCount: 13,
+  },
+  {
+    id: 'dist-nawada',
+    name: 'Nawada',
+    hindiName: 'नवादा',
+    division: 'Magadh Division',
+    headquarters: 'Nawada',
+    popularAreas: ['P सद्भाव Chowk', 'Main Road', 'Gola Road', 'Parsawan', 'Hisua', 'Rajauli'],
+    pincodes: ['805110', '805111'],
+    activeMentorsCount: 12,
+  },
+  {
+    id: 'dist-jehanabad',
+    name: 'Jehanabad',
+    hindiName: 'जहानाबाद',
+    division: 'Magadh Division',
+    headquarters: 'Jehanabad',
+    popularAreas: ['Court Area', 'Hospital More', 'Station Road', 'Mallikana', 'Makhdumpur'],
+    pincodes: ['804408', '804417'],
+    activeMentorsCount: 11,
+  },
+  {
+    id: 'dist-arwal',
+    name: 'Arwal',
+    hindiName: 'अरवल',
+    division: 'Magadh Division',
+    headquarters: 'Arwal',
+    popularAreas: ['Main Chowk', 'Collectorate Area', 'Son River Road', 'Kurtha', 'Kaler'],
+    pincodes: ['804401'],
+    activeMentorsCount: 7,
+  },
+];
+
+export const BIHAR_DISTRICT_NAMES: string[] = ALL_38_BIHAR_DISTRICTS.map((d) => d.name);
+
+export const TOTAL_BIHAR_DISTRICTS_COUNT = 38;
+export const TOTAL_BIHAR_ACTIVE_MENTORS_COUNT = ALL_38_BIHAR_DISTRICTS.reduce((sum, d) => sum + d.activeMentorsCount, 0);
+
+export function getDistrictByName(name: string): BiharDistrict | undefined {
+  if (!name) return undefined;
+  const clean = name.toLowerCase().trim();
+  return ALL_38_BIHAR_DISTRICTS.find(
+    (d) =>
+      d.name.toLowerCase() === clean ||
+      d.name.toLowerCase().includes(clean) ||
+      clean.includes(d.name.toLowerCase().split(' ')[0])
+  );
+}

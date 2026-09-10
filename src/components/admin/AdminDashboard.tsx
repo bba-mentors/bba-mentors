@@ -31,6 +31,7 @@ import {
 } from 'recharts';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { api } from '../../services/api.ts';
+import { ALL_ACADEMIC_CLASSES } from '../../data/academicClasses.ts';
 import type {
   TuitionRequest,
   Mentor,
@@ -527,7 +528,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
                     onChange={(e) => setExamForm({ ...examForm, classGrade: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                   >
-                    {['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((c) => (
+                    {ALL_ACADEMIC_CLASSES.map((c) => (
                       <option key={c} value={c}>{c}</option>
                     ))}
                   </select>

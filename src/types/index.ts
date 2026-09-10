@@ -299,6 +299,8 @@ export interface StudentProgressSummary {
 export interface BiharDistrict {
   id: string;
   name: string;
+  hindiName?: string;
+  division?: string;
   headquarters: string;
   popularAreas: string[];
   pincodes: string[];

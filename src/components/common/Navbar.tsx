@@ -206,7 +206,7 @@ export function Navbar({ currentView, onNavigate }: NavbarProps) {
                   className="flex items-center gap-2 px-3 py-2 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 font-semibold text-sm hover:bg-blue-100 transition"
                 >
                   <User className="w-4 h-4 text-blue-700" />
-                  <span>{user.name.split(' ')[0]}</span>
+                  <span>{(user?.name || 'User').split(' ')[0]}</span>
                   <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 bg-blue-600 text-white rounded">
                     {role}
                   </span>

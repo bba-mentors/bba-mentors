@@ -33,6 +33,8 @@ import {
   CheckSquare,
 } from 'lucide-react';
 import { api } from '../../services/api.ts';
+import { ALL_38_BIHAR_DISTRICTS, TOTAL_BIHAR_DISTRICTS_COUNT } from '../../data/biharDistricts.ts';
+import { ALL_ACADEMIC_CLASSES } from '../../data/academicClasses.ts';
 
 interface HomeTuitionProps {
   onNavigate: (view: string, data?: any) => void;
@@ -529,14 +531,11 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
                           onChange={(e) => setDemoForm({ ...demoForm, classGrade: e.target.value })}
                           className="w-full px-2.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-900 bg-white text-xs font-medium"
                         >
-                          <option value="Class 1-5">Class 1 to 5 (Primary)</option>
-                          <option value="Class 6">Class 6</option>
-                          <option value="Class 7">Class 7</option>
-                          <option value="Class 8">Class 8</option>
-                          <option value="Class 9">Class 9</option>
-                          <option value="Class 10">Class 10 (Matric / Board)</option>
-                          <option value="Class 11">Class 11 (Intermediate)</option>
-                          <option value="Class 12">Class 12 (Board / JEE / NEET)</option>
+                          {ALL_ACADEMIC_CLASSES.map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -556,22 +555,21 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <label className="font-bold text-slate-700 block mb-1">
-                          जिला (District in Bihar)
-                        </label>
+                        <div className="flex justify-between items-center mb-1">
+                          <label className="font-bold text-slate-700 block">
+                            जिला (District - All {TOTAL_BIHAR_DISTRICTS_COUNT} Active)
+                          </label>
+                        </div>
                         <select
                           value={demoForm.district}
                           onChange={(e) => setDemoForm({ ...demoForm, district: e.target.value })}
                           className="w-full px-2.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-900 bg-white text-xs font-medium"
                         >
-                          <option value="Patna">Patna (पटना)</option>
-                          <option value="Gaya">Gaya (गया)</option>
-                          <option value="Muzaffarpur">Muzaffarpur (मुजफ्फरपुर)</option>
-                          <option value="Bhagalpur">Bhagalpur (भागलपुर)</option>
-                          <option value="Darbhanga">Darbhanga (दरभंगा)</option>
-                          <option value="Purnia">Purnia (पूर्णिया)</option>
-                          <option value="Begusarai">Begusarai (बेगूसराय)</option>
-                          <option value="Bhojpur">Bhojpur - Ara (आरा)</option>
+                          {ALL_38_BIHAR_DISTRICTS.map((d) => (
+                            <option key={d.id} value={d.name}>
+                              {d.name} {d.hindiName ? `(${d.hindiName})` : ''}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -1188,16 +1186,20 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
           {(activeClassTab === 'all' || activeClassTab === 'primary') && (
             <div className="p-6 rounded-3xl bg-white border border-slate-200 space-y-4 shadow-sm hover:shadow-xl transition flex flex-col justify-between">
               <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center font-black text-base">
-                  1-5
+                <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center font-black text-xs text-center leading-tight">
+                  Nur - 5
                 </div>
                 <div>
                   <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wide">
-                    नींव का विकास (Foundation)
+                    प्रारंभिक एवं नींव विकास (Foundation)
                   </span>
-                  <h3 className="text-lg font-black text-slate-900">प्राथमिक वर्ग (Class 1 to 5)</h3>
+                  <h3 className="text-lg font-black text-slate-900">नर्सरी से 5वीं (Nursery to Class 5)</h3>
                 </div>
                 <ul className="space-y-2 text-xs text-slate-600">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>नर्सरी, LKG, UKG के लिए फोॅनिक्स (Phonics), वर्णमाला व अक्षराभ्यास</span>
+                  </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                     <span>सुंदर लिखावट (Handwriting) व शुद्ध उच्चारण का अभ्यास</span>
@@ -1212,16 +1214,16 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>धैर्यवान महिला शिक्षिका की विशेष उपलब्धता</span>
+                    <span>धैर्यवान महिला शिक्षिका (Female Home Tutors) की विशेष उपलब्धता</span>
                   </li>
                 </ul>
               </div>
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                 <button
-                  onClick={() => onNavigate('find-mentor', { classGrade: 'Class 1-5', mode: 'Home Tuition' })}
+                  onClick={() => onNavigate('find-mentor', { classGrade: 'Class 1', mode: 'Home Tuition' })}
                   className="text-xs font-bold text-blue-900 hover:text-blue-950 flex items-center gap-1"
                 >
-                  <span>प्राइमरी ट्यूटर देखें</span>
+                  <span>नर्सरी व 1-5 ट्यूटर देखें</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <a href="#book-home-demo" className="text-[11px] font-semibold text-amber-700 hover:underline">
@@ -1805,6 +1807,29 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* All 38 Districts State-Wide Guarantee Callout */}
+        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-950 to-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-6 border border-amber-400/30 shadow-lg">
+          <div className="space-y-2 text-center sm:text-left">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-black uppercase tracking-wider">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
+              <span>100% State Coverage • All 38 Districts Active</span>
+            </div>
+            <h3 className="text-xl sm:text-2xl font-black text-white">
+              क्या आपका जिला ऊपर सूचीबद्ध नहीं है? हम बिहार के सभी 38 जिलों में सक्रिय हैं!
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
+              किशनगंज, अरवल, मधुबनी, पश्चिम चम्पारण, रोहतास, सहरसा, सीवान और कैमूर सहित बिहार के प्रत्येक 38 जिलों में हमारे योग्य होम ट्यूटर और ऑनलाइन मेंटर उपलब्ध हैं।
+            </p>
+          </div>
+          <button
+            onClick={() => onNavigate('classes-boards', { tab: 'locations' })}
+            className="px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-blue-950 font-black text-xs sm:text-sm rounded-xl transition shadow-md whitespace-nowrap flex items-center gap-2 shrink-0"
+          >
+            <span>सभी 38 जिलों की डायरेक्टरी देखें</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </section>
 

@@ -297,7 +297,7 @@ export function MentorDashboard({ onNavigate }: MentorDashboardProps) {
                     <div className="p-3 rounded-xl bg-slate-50 border border-slate-100">
                       <span className="text-slate-400 text-[10px] block">Attendance</span>
                       <span className="font-extrabold text-slate-900 text-sm mt-0.5 block">
-                        {student.summary.attendancePercentage}% ({student.summary.attendedClasses} classes)
+                        {student.summary?.attendancePercentage ?? 0}% ({student.summary?.attendedClasses ?? student.summary?.completedClasses ?? 0} classes)
                       </span>
                     </div>
                   </div>
@@ -305,7 +305,7 @@ export function MentorDashboard({ onNavigate }: MentorDashboardProps) {
                   {/* Weak Topics to Focus on During Tuition */}
                   <div className="text-xs flex items-center gap-2 flex-wrap pt-1">
                     <span className="font-bold text-amber-800">Target Weak Topics to Clear:</span>
-                    {student.summary.weakTopics.map((t) => (
+                    {(student.summary?.weakTopics || []).map((t) => (
                       <span key={t} className="px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-200 text-[11px] font-semibold">
                         ⚠ {t}
                       </span>

@@ -12,6 +12,8 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
+import { ALL_38_BIHAR_DISTRICTS } from '../../data/biharDistricts.ts';
+import { ALL_ACADEMIC_CLASSES } from '../../data/academicClasses.ts';
 
 interface AuthPageProps {
   onNavigate: (view: string, data?: any) => void;
@@ -159,14 +161,18 @@ export function ParentRegisterPage({ onNavigate, onSuccess }: AuthPageProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Bihar District *</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Bihar District ({ALL_38_BIHAR_DISTRICTS.length}) *
+                </label>
                 <select
                   value={form.district}
                   onChange={(e) => setForm({ ...form, district: e.target.value, city: e.target.value })}
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                 >
-                  {['Patna', 'Gaya', 'Muzaffarpur', 'Bhagalpur', 'Darbhanga', 'Purnia', 'Begusarai', 'Bhojpur (Ara)'].map((d) => (
-                    <option key={d} value={d}>{d}</option>
+                  {ALL_38_BIHAR_DISTRICTS.map((d) => (
+                    <option key={d.id} value={d.name}>
+                      {d.name} {d.hindiName ? `(${d.hindiName})` : ''}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -207,7 +213,7 @@ export function ParentRegisterPage({ onNavigate, onSuccess }: AuthPageProps) {
                   onChange={(e) => setForm({ ...form, classGrade: e.target.value })}
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                 >
-                  {['Class 6', 'Class 7', 'Class 8', 'Class 9', 'Class 10', 'Class 11', 'Class 12'].map((c) => (
+                  {ALL_ACADEMIC_CLASSES.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
