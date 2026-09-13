@@ -100,14 +100,12 @@ export const api = {
   getCurrentUser: () => request<{ user: User; profile: any }>('/auth/me'),
 
   syncFirebaseUser: (data: {
-    uid: string;
-    email: string;
+    idToken: string;
     role: string;
     name: string;
     mobile?: string;
     district?: string;
     city?: string;
-    state?: string;
     profileData?: any;
   }) =>
     request<{ token: string; user: User & { profileId?: string } }>('/auth/firebase-sync', {
