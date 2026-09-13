@@ -49,15 +49,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               if (mSnap.exists()) profileData = mSnap.data();
             }
 
+            const idToken = await fbUser.getIdToken();
             const syncRes = await api.syncFirebaseUser({
-              uid: fbUser.uid,
-              email: userData.email,
+              idToken,
               role: userData.role,
               name: userData.name,
               mobile: userData.mobile,
               district: userData.district,
               city: userData.city,
-              state: 'Bihar',
               profileData,
             });
 
@@ -129,14 +128,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const fbResult = await firestoreService.loginWithFirebase(cleanEmail, password, requestedRole);
         const syncRes = await api.syncFirebaseUser({
-          uid: fbResult.uid,
-          email: fbResult.userData.email,
+          idToken: fbResult.idToken,
           role: fbResult.userData.role,
           name: fbResult.userData.name,
           mobile: fbResult.userData.mobile,
           district: fbResult.userData.district,
           city: fbResult.userData.city,
-          state: 'Bihar',
           profileData: fbResult.profileData,
         });
 
@@ -186,14 +183,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const syncRes = await api.syncFirebaseUser({
-        uid: fbResult.uid,
-        email: fbResult.userData.email,
+        idToken: fbResult.idToken,
         role: 'PARENT',
         name: fbResult.userData.name,
         mobile: fbResult.userData.mobile,
         district: fbResult.userData.district,
         city: fbResult.userData.city,
-        state: 'Bihar',
         profileData: {
           address: fbResult.parentData.address,
           child: fbResult.studentData,
@@ -233,14 +228,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const syncRes = await api.syncFirebaseUser({
-        uid: fbResult.uid,
-        email: fbResult.userData.email,
+        idToken: fbResult.idToken,
         role: 'MENTOR',
         name: fbResult.userData.name,
         mobile: fbResult.userData.mobile,
         district: fbResult.userData.district,
         city: fbResult.userData.city,
-        state: 'Bihar',
         profileData: fbResult.mentorData,
       });
 
@@ -257,16 +250,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loginWithGoogle = async () => {
     setIsLoading(true);
     try {
-      const { fbUser, userData } = await firestoreService.signInWithGoogle();
+      const { fbUser, idToken, userData } = await firestoreService.signInWithGoogle();
       const syncRes = await api.syncFirebaseUser({
-        uid: fbUser.uid,
-        email: userData.email,
+        idToken,
         role: 'PARENT',
         name: userData.name,
         mobile: userData.mobile,
         district: userData.district,
         city: userData.city,
-        state: 'Bihar',
       });
 
       localStorage.setItem('bba_mentors_token', syncRes.token);

@@ -20,6 +20,7 @@ import {
   isValidIndianPhone,
   normalizePhone,
 } from './security.ts';
+import { verifyFirebaseIdToken } from './firebaseAuth.ts';
 import type {
   User,
   Parent,
@@ -97,20 +98,7 @@ apiRouter.post('/auth/login', authLimiter, (req, res) => {
   }
 
   const storedPwd = dbInstance.passwords[user.id];
-  let isPasswordValid = Boolean(storedPwd && verifyPassword(passwordRaw, storedPwd.hash, storedPwd.salt));
-
-  // For Admin Dharmraj (kdharmraj778@gmail.com), support 6287919120@DHARMRAJ and case/formatting variations seamlessly
-  if (!isPasswordValid && user.role === 'ADMIN' && user.email.toLowerCase() === 'kdharmraj778@gmail.com') {
-    const rawTrimmed = (passwordRaw || '').trim();
-    if (
-      rawTrimmed === '6287919120@DHARMRAJ' ||
-      rawTrimmed === '6287919120DHARMRAJ' ||
-      rawTrimmed.toUpperCase() === '6287919120@DHARMRAJ' ||
-      rawTrimmed.toUpperCase() === '6287919120DHARMRAJ'
-    ) {
-      isPasswordValid = true;
-    }
-  }
+  const isPasswordValid = Boolean(storedPwd && verifyPassword(passwordRaw, storedPwd.hash, storedPwd.salt));
 
   if (!isPasswordValid) {
     res.status(401).json({ error: 'Invalid email or password' });
@@ -142,33 +130,57 @@ apiRouter.post('/auth/login', authLimiter, (req, res) => {
 });
 
 // Firebase Authentication Session Sync Endpoint
-apiRouter.post('/auth/firebase-sync', (req, res) => {
+// SECURITY: uid/email are NEVER trusted from the request body — they are derived
+// exclusively from a verified Firebase ID token so a caller cannot mint a session
+// for an arbitrary or existing account by guessing its email/uid.
+apiRouter.post('/auth/firebase-sync', async (req, res) => {
   const {
-    uid,
-    email,
+    idToken,
     role,
     name,
     mobile,
     district = 'Patna',
     city = 'Patna',
-    state = 'Bihar',
     profileData,
   } = req.body;
 
-  if (!uid || !email || !role) {
-    res.status(400).json({ error: 'uid, email, and role are required for Firebase session sync' });
+  if (!idToken || !role) {
+    res.status(400).json({ error: 'idToken and role are required for Firebase session sync' });
     return;
   }
 
-  const cleanEmail = sanitizeString(email, 150).toLowerCase();
+  // Only self-service roles may be requested by a client; ADMIN is never
+  // client-settable and is derived solely from the verified email below.
+  if (role !== 'PARENT' && role !== 'MENTOR') {
+    res.status(400).json({ error: 'Invalid role for Firebase session sync' });
+    return;
+  }
+
+  const verified = await verifyFirebaseIdToken(idToken);
+  if (!verified) {
+    res.status(401).json({ error: 'Invalid or expired Firebase session. Please sign in again.' });
+    return;
+  }
+
+  const uid = verified.uid;
+  const cleanEmail = sanitizeString(verified.email, 150).toLowerCase();
+  if (!cleanEmail) {
+    res.status(401).json({ error: 'Firebase session is missing a verified email address' });
+    return;
+  }
+
   const cleanName = sanitizeString(name || 'BBA User', 100);
   const cleanMobile = mobile ? normalizePhone(mobile) : '9800000000';
   const cleanDistrict = sanitizeString(district, 80);
   const cleanCity = sanitizeString(city, 80);
 
-  let user = dbInstance.users.find((u) => u.id === uid || u.email.toLowerCase() === cleanEmail);
+  // Match strictly by uid (the verified Firebase identity), never by email,
+  // so a caller cannot hijack an existing account by supplying its email.
+  let user = dbInstance.users.find((u) => u.id === uid);
   const isAdminEmail = cleanEmail === 'kdharmraj778@gmail.com';
-  const effectiveRole = isAdminEmail ? 'ADMIN' : (role as any);
+  // Role for an EXISTING account is never changed by this endpoint (prevents
+  // privilege escalation on re-sync); only a brand-new account gets `role`.
+  const effectiveRole = isAdminEmail ? 'ADMIN' : user ? user.role : (role as any);
   const effectiveName = isAdminEmail ? 'Dharmraj (Director & Admin)' : cleanName;
 
   if (!user) {

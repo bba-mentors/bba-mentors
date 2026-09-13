@@ -137,7 +137,8 @@ export const firestoreService = {
         });
       }
 
-      return { uid, userData, parentData, studentData };
+      const idToken = await userCred.user.getIdToken();
+      return { uid, idToken, userData, parentData, studentData };
     } catch (err: any) {
       throw new Error(formatFirebaseAuthError(err));
     }
@@ -223,7 +224,7 @@ export const firestoreService = {
         createdAtServer: serverTimestamp(),
       });
 
-      return { uid, userData, mentorData };
+      return { uid, idToken: await userCred.user.getIdToken(), userData, mentorData };
     } catch (err: any) {
       throw new Error(formatFirebaseAuthError(err));
     }
@@ -282,7 +283,7 @@ export const firestoreService = {
         if (mSnap.exists()) profileData = mSnap.data();
       }
 
-      return { uid, userData, profileData };
+      return { uid, idToken: await userCred.user.getIdToken(), userData, profileData };
     } catch (err: any) {
       throw new Error(formatFirebaseAuthError(err));
     }
@@ -356,7 +357,7 @@ export const firestoreService = {
         userData = userSnap.data() as User;
       }
 
-      return { fbUser, userData };
+      return { fbUser, idToken: await fbUser.getIdToken(), userData };
     } catch (err: any) {
       console.error('Firebase Google Sign-In error:', err);
       throw new Error(formatFirebaseAuthError(err));
