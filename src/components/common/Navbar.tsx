@@ -12,6 +12,8 @@ import {
   RotateCcw,
   LogOut,
   Bell,
+  Phone,
+  Mail,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { api } from '../../services/api.ts';
@@ -40,6 +42,39 @@ export function Navbar({ currentView, onNavigate }: NavbarProps) {
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-200">
+      {/* Top Contact & Location Bar */}
+      <div className="bg-slate-900 text-slate-300 text-[11px] py-1.5 px-4 border-b border-slate-800">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+          <div className="flex items-center gap-2">
+            <MapPin className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+            <span className="text-slate-200 font-medium">Tingachiya, Katihar, Bihar - 854112</span>
+          </div>
+          <div className="flex items-center gap-3 font-semibold">
+            <a
+              href="tel:+919576767949"
+              className="flex items-center gap-1.5 text-slate-200 hover:text-emerald-400 transition"
+              title="Call Helpline"
+            >
+              <Phone className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+              <span>9576767949</span>
+            </a>
+            <span className="text-slate-600">|</span>
+            <a
+              href="mailto:bbatestseries@gmail.com"
+              className="flex items-center gap-1.5 text-slate-200 hover:text-amber-400 transition"
+              title="Email Us"
+            >
+              <Mail className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>bbatestseries@gmail.com</span>
+            </a>
+            <span className="hidden sm:inline-flex items-center gap-1 text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-500/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span>🔥 Firebase Firestore Active</span>
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">

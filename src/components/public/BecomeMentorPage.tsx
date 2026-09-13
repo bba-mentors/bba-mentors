@@ -10,7 +10,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { ALL_38_BIHAR_DISTRICTS } from '../../data/biharDistricts.ts';
+import { BIHAR_38_DISTRICTS } from '../../data/biharDistricts.ts';
 
 interface BecomeMentorProps {
   onNavigate: (view: string) => void;
@@ -28,17 +28,17 @@ export function BecomeMentorPage({ onNavigate }: BecomeMentorProps) {
     mobile: '',
     password: '',
     district: 'Patna',
-    city: 'Patna',
-    preferredAreas: 'Boring Road, Kankarbagh',
-    qualification: 'B.Tech / M.Sc Mathematics',
-    college: 'NIT Patna',
-    teachingExperience: '3+ Years',
-    subjects: 'Mathematics, Science',
-    classes: 'Class 8, Class 9, Class 10',
+    city: '',
+    preferredAreas: '',
+    qualification: '',
+    college: '',
+    teachingExperience: '',
+    subjects: '',
+    classes: '',
     boards: 'CBSE, BSEB',
     teachingMode: 'Home Tuition',
-    availability: 'Mon-Sat 4:00 PM - 8:00 PM',
-    expectedFee: '₹4,500 - ₹6,000 / month',
+    availability: '',
+    expectedFee: '',
     about: '',
   });
 
@@ -47,26 +47,26 @@ export function BecomeMentorPage({ onNavigate }: BecomeMentorProps) {
     setErrorMsg(null);
     setSubmitting(true);
     try {
-      const msg = await registerMentor({
-        name: form.name,
-        email: form.email,
-        mobile: form.mobile,
+      await registerMentor({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        mobile: form.mobile.trim(),
         password: form.password,
         district: form.district,
-        city: form.city,
-        preferredAreas: form.preferredAreas.split(',').map((s) => s.trim()),
-        qualification: form.qualification,
-        college: form.college,
-        teachingExperience: form.teachingExperience,
-        subjects: form.subjects.split(',').map((s) => s.trim()),
-        classes: form.classes.split(',').map((s) => s.trim()),
-        boards: form.boards.split(',').map((s) => s.trim()),
+        city: form.city.trim() || form.district,
+        preferredAreas: form.preferredAreas ? form.preferredAreas.split(',').map((s) => s.trim()).filter(Boolean) : [form.city || form.district],
+        qualification: form.qualification.trim(),
+        college: form.college.trim() || 'University in Bihar',
+        teachingExperience: form.teachingExperience.trim() || '2+ Years',
+        subjects: form.subjects.split(',').map((s) => s.trim()).filter(Boolean),
+        classes: form.classes.split(',').map((s) => s.trim()).filter(Boolean),
+        boards: form.boards.split(',').map((s) => s.trim()).filter(Boolean),
         teachingMode: form.teachingMode,
-        availability: form.availability,
-        expectedFee: form.expectedFee,
-        about: form.about || 'Dedicated educator focused on building student confidence and rigorous problem solving.',
+        availability: form.availability.trim() || 'Evenings 4:00 PM - 8:00 PM',
+        expectedFee: form.expectedFee.trim() || '₹3,500 - ₹5,000 / month',
+        about: form.about.trim() || 'Dedicated educator focused on building student confidence and rigorous problem solving.',
       });
-      setSubmittedMessage(msg || 'Application submitted successfully! Our academic team will verify your credentials.');
+      onNavigate('mentor-dashboard');
     } catch (err: any) {
       setErrorMsg(err.message || 'Registration failed. Please check inputs.');
     } finally {
@@ -125,7 +125,7 @@ export function BecomeMentorPage({ onNavigate }: BecomeMentorProps) {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} autoComplete="off" className="space-y-6">
               {errorMsg && (
                 <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-semibold">
                   {errorMsg}
@@ -234,18 +234,14 @@ export function BecomeMentorPage({ onNavigate }: BecomeMentorProps) {
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">
-                      Bihar District ({ALL_38_BIHAR_DISTRICTS.length} Districts Open for Registration) *
-                    </label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Bihar District *</label>
                     <select
                       value={form.district}
                       onChange={(e) => setForm({ ...form, district: e.target.value, city: e.target.value })}
                       className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                     >
-                      {ALL_38_BIHAR_DISTRICTS.map((d) => (
-                        <option key={d.id} value={d.name}>
-                          {d.name} {d.hindiName ? `(${d.hindiName})` : ''} - {d.headquarters}
-                        </option>
+                      {BIHAR_38_DISTRICTS.map((d) => (
+                        <option key={d.name} value={d.name}>{d.name} ({d.hindiName})</option>
                       ))}
                     </select>
                   </div>
@@ -272,11 +268,11 @@ export function BecomeMentorPage({ onNavigate }: BecomeMentorProps) {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1">Classes you teach (comma-separated) *</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">Classes (comma-separated) *</label>
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Nursery, LKG, UKG, Class 1 to 5, Class 9, Class 10"
+                      placeholder="e.g. Nursery to 5, Class 8, Class 10"
                       value={form.classes}
                       onChange={(e) => setForm({ ...form, classes: e.target.value })}
                       className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-900"

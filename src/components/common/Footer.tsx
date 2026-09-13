@@ -1,7 +1,8 @@
 import { GraduationCap, MapPin, Phone, Mail, Shield, CheckCircle2 } from 'lucide-react';
+import { BIHAR_38_DISTRICTS } from '../../data/biharDistricts.ts';
 
 interface FooterProps {
-  onNavigate: (view: string) => void;
+  onNavigate: (view: string, data?: any) => void;
 }
 
 export function Footer({ onNavigate }: FooterProps) {
@@ -28,15 +29,19 @@ export function Footer({ onNavigate }: FooterProps) {
             <div className="pt-2 text-xs text-slate-400 space-y-1">
               <p className="flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-blue-400" />
-                <span>Central Academic Office: Boring Canal Road / Bailey Road, Patna, Bihar - 800001</span>
+                <span>Central Academic Office: Tingachiya, Katihar, Bihar - 854112</span>
               </p>
               <p className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-emerald-400" />
-                <span>Parent Counselor Helpline & WhatsApp: +91 9576767949 / 0612-2500001</span>
+                <a href="tel:+919576767949" className="hover:text-emerald-300 transition">
+                  Parent Counselor Helpline: +91 9576767949
+                </a>
               </p>
               <p className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-amber-400" />
-                <span>Academic Queries: support@bbamentors.com</span>
+                <a href="mailto:bbatestseries@gmail.com" className="hover:text-amber-300 transition">
+                  Email: bbatestseries@gmail.com
+                </a>
               </p>
             </div>
           </div>
@@ -57,7 +62,7 @@ export function Footer({ onNavigate }: FooterProps) {
               </li>
               <li>
                 <button onClick={() => onNavigate('classes')} className="hover:text-white transition">
-                  Classes (Class 1 to 12)
+                  Classes (Nursery to 10th)
                 </button>
               </li>
               <li>
@@ -148,15 +153,27 @@ export function Footer({ onNavigate }: FooterProps) {
           </div>
         </div>
 
-        {/* Bihar Coverage Badges */}
+        {/* Bihar Coverage Badges - All 38 Districts */}
         <div className="py-6 border-b border-slate-800 text-xs text-slate-400">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="font-semibold text-slate-200">Active Bihar Districts:</span>
-            {['Patna', 'Gaya', 'Muzaffarpur', 'Bhagalpur', 'Darbhanga', 'Purnia', 'Begusarai', 'Bhojpur (Ara)', 'Samastipur', 'Nalanda'].map((d) => (
-              <span key={d} className="px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
-                {d}
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-slate-200">Bihar All 38 Districts:</span>
+              <span className="px-2 py-0.5 rounded-full bg-blue-950 text-blue-300 border border-blue-800 font-bold text-[10px]">
+                38 Districts Covered
               </span>
-            ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5">
+              {BIHAR_38_DISTRICTS.map((d) => (
+                <button
+                  key={d.name}
+                  onClick={() => onNavigate('find-mentor', { district: d.name })}
+                  className="px-2 py-0.5 rounded bg-slate-800/90 hover:bg-blue-900 hover:text-white text-slate-300 border border-slate-700/80 text-[11px] transition cursor-pointer"
+                  title={`Find mentors in ${d.name} (${d.hindiName})`}
+                >
+                  {d.name} <span className="text-[10px] text-slate-400">({d.hindiName})</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -165,15 +182,14 @@ export function Footer({ onNavigate }: FooterProps) {
           <p>© {new Date().getFullYear()} BBA Mentors. All rights reserved. Bihar, India. Tagline: "Learn. Test. Improve."</p>
 
           <div className="flex items-center">
-            {/* Unobtrusive Dot-style Admin Login Button */}
+            {/* Discreet admin entrance: a tiny corner dot */}
             <button
               id="footer-admin-login-btn"
               onClick={() => onNavigate('admin-login')}
-              className="w-5 h-5 flex items-center justify-center rounded-full hover:bg-slate-800 transition-colors group cursor-pointer"
-              title="Admin Login"
-              aria-label="Admin Login"
+              className="inline-flex items-center justify-center p-1 text-slate-700 hover:text-slate-400 transition-colors cursor-pointer select-none"
+              aria-label="Staff"
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-600 group-hover:bg-slate-300 transition-all duration-200" />
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-700 hover:bg-slate-400 transition-colors" />
             </button>
           </div>
         </div>

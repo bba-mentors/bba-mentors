@@ -31,7 +31,7 @@ import {
 } from 'recharts';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { api } from '../../services/api.ts';
-import { ALL_ACADEMIC_CLASSES } from '../../data/academicClasses.ts';
+import { BIHAR_SCHOOL_CLASSES } from '../../data/classes.ts';
 import type {
   TuitionRequest,
   Mentor,
@@ -355,7 +355,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
                       <strong>Parent:</strong> {req.parentName} ({req.parentMobile}) • <strong>Location:</strong> {req.city}, {req.district}
                     </p>
                     <p className="text-slate-500">
-                      <strong>Subjects:</strong> {req.subjects.join(', ')} • <strong>Budget:</strong> {req.budget} • <strong>Timing:</strong> {req.preferredTiming}
+                      <strong>Subjects:</strong> {(req.subjects || []).join(', ')} • <strong>Budget:</strong> {req.budget} • <strong>Timing:</strong> {req.preferredTiming}
                     </p>
                   </div>
 
@@ -419,10 +419,10 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
                         {m.qualification} • {m.college} • {m.teachingExperience} Exp
                       </p>
                       <p className="text-slate-500">
-                        <strong>District:</strong> {m.district} ({m.preferredAreas.join(', ')}) • <strong>Mobile:</strong> {m.mobile}
+                        <strong>District:</strong> {m.district} ({(m.preferredAreas || []).join(', ')}) • <strong>Mobile:</strong> {m.mobile}
                       </p>
                       <p className="text-slate-500">
-                        <strong>Subjects:</strong> {m.subjects.join(', ')} • <strong>Classes:</strong> {m.classes.join(', ')}
+                        <strong>Subjects:</strong> {(m.subjects || []).join(', ')} • <strong>Classes:</strong> {(m.classes || []).join(', ')}
                       </p>
                     </div>
                   </div>
@@ -479,7 +479,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
                       <td className="p-3 font-bold text-slate-900">{s.name}</td>
                       <td className="p-3">{s.classGrade} ({s.board})</td>
                       <td className="p-3">{s.schoolName}</td>
-                      <td className="p-3">{s.targetSubjects.join(', ')}</td>
+                      <td className="p-3">{(s.targetSubjects || []).join(', ')}</td>
                       <td className="p-3">
                         {s.assignedMentorId ? (
                           <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 text-[10px] font-bold">
@@ -528,7 +528,7 @@ export function AdminDashboard({ onNavigate }: AdminDashboardProps) {
                     onChange={(e) => setExamForm({ ...examForm, classGrade: e.target.value })}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                   >
-                    {ALL_ACADEMIC_CLASSES.map((c) => (
+                    {BIHAR_SCHOOL_CLASSES.map((c) => (
                       <option key={c} value={c}>{c}</option>
                     ))}
                   </select>

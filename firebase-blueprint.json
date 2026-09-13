@@ -1,0 +1,221 @@
+{
+  "entities": {
+    "users": {
+      "description": "User accounts with roles for Parent, Mentor, and Admin",
+      "fields": {
+        "email": { "type": "string", "description": "User email address" },
+        "role": { "type": "string", "description": "PARENT | MENTOR | ADMIN" },
+        "name": { "type": "string", "description": "Full name" },
+        "mobile": { "type": "string", "description": "Mobile contact number" },
+        "district": { "type": "string", "description": "Bihar District" },
+        "city": { "type": "string", "description": "City or locality" },
+        "state": { "type": "string", "description": "State (Bihar)" },
+        "createdAt": { "type": "string", "description": "Account creation ISO timestamp" }
+      }
+    },
+    "parents": {
+      "description": "Parent profiles managing their children's tutoring",
+      "fields": {
+        "userId": { "type": "string", "description": "Associated user account ID" },
+        "name": { "type": "string", "description": "Parent name" },
+        "mobile": { "type": "string", "description": "Primary mobile number" },
+        "email": { "type": "string", "description": "Contact email" },
+        "city": { "type": "string", "description": "Town or city" },
+        "district": { "type": "string", "description": "District in Bihar" },
+        "state": { "type": "string", "description": "State" },
+        "address": { "type": "string", "description": "Residential home address" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      }
+    },
+    "mentors": {
+      "description": "Tutor and Mentor directory profiles",
+      "fields": {
+        "userId": { "type": "string", "description": "Associated user ID" },
+        "fullName": { "type": "string", "description": "Tutor full name" },
+        "mobile": { "type": "string", "description": "Phone number" },
+        "email": { "type": "string", "description": "Email address" },
+        "qualification": { "type": "string", "description": "Degree or background" },
+        "college": { "type": "string", "description": "College / University" },
+        "teachingExperience": { "type": "string", "description": "Experience years" },
+        "subjects": { "type": "array", "description": "Teaching subjects" },
+        "classes": { "type": "array", "description": "Teaching classes" },
+        "boards": { "type": "array", "description": "BSEB, CBSE, ICSE" },
+        "preferredAreas": { "type": "array", "description": "Colonies or areas covered" },
+        "district": { "type": "string", "description": "Bihar district" },
+        "city": { "type": "string", "description": "City" },
+        "pincode": { "type": "string", "description": "Postal pincode" },
+        "teachingMode": { "type": "string", "description": "Home Tuition | Online Tuition | Hybrid" },
+        "availability": { "type": "string", "description": "Time slots available" },
+        "expectedFee": { "type": "string", "description": "Expected hourly/monthly fee" },
+        "about": { "type": "string", "description": "Tutor bio" },
+        "profilePhoto": { "type": "string", "description": "Photo URL" },
+        "rating": { "type": "number", "description": "Average rating out of 5" },
+        "reviewCount": { "type": "number", "description": "Total reviews count" },
+        "verificationStatus": { "type": "string", "description": "Pending | Verified | Rejected" },
+        "createdAt": { "type": "string", "description": "Registration date" }
+      }
+    },
+    "students": {
+      "description": "Enrolled students under parental care",
+      "fields": {
+        "parentId": { "type": "string", "description": "Parent document ID" },
+        "name": { "type": "string", "description": "Student full name" },
+        "classGrade": { "type": "string", "description": "Class grade (Nursery to Class 10)" },
+        "board": { "type": "string", "description": "BSEB | CBSE | ICSE" },
+        "schoolName": { "type": "string", "description": "Enrolled school name" },
+        "gender": { "type": "string", "description": "Gender" },
+        "subjects": { "type": "array", "description": "Subjects requiring tuition" },
+        "learningGoals": { "type": "string", "description": "Academic goals" },
+        "currentAcademicLevel": { "type": "string", "description": "Baseline level" },
+        "address": { "type": "string", "description": "Full home address" },
+        "district": { "type": "string", "description": "Bihar district" },
+        "city": { "type": "string", "description": "Town or city" },
+        "preferredMode": { "type": "string", "description": "Home Tuition | Online Tuition" },
+        "preferredTutorGender": { "type": "string", "description": "Gender preference" },
+        "preferredTiming": { "type": "string", "description": "Preferred study hour" },
+        "monthlyBudget": { "type": "string", "description": "Monthly budget" },
+        "assignedMentorId": { "type": "string", "description": "Assigned tutor ID" },
+        "status": { "type": "string", "description": "Active | Pending Mentor | Inactive" },
+        "createdAt": { "type": "string", "description": "Enrollment date" }
+      }
+    },
+    "tuitionRequests": {
+      "description": "Tuition inquiries and booking requests",
+      "fields": {
+        "parentId": { "type": "string", "description": "Parent ID" },
+        "studentId": { "type": "string", "description": "Student ID" },
+        "studentName": { "type": "string", "description": "Student Name" },
+        "classGrade": { "type": "string", "description": "Class" },
+        "board": { "type": "string", "description": "Education board" },
+        "subjects": { "type": "array", "description": "Subjects" },
+        "district": { "type": "string", "description": "District" },
+        "city": { "type": "string", "description": "City" },
+        "area": { "type": "string", "description": "Locality" },
+        "preferredTiming": { "type": "string", "description": "Timing" },
+        "budget": { "type": "string", "description": "Budget" },
+        "teachingMode": { "type": "string", "description": "Home Tuition | Online Tuition" },
+        "genderPreference": { "type": "string", "description": "Tutor gender preference" },
+        "status": { "type": "string", "description": "Pending | Assigned | Completed" },
+        "assignedMentorId": { "type": "string", "description": "Assigned tutor ID" },
+        "notes": { "type": "string", "description": "Additional requirements" },
+        "parentName": { "type": "string", "description": "Parent contact name" },
+        "parentMobile": { "type": "string", "description": "Parent contact phone" },
+        "createdAt": { "type": "string", "description": "Request date" }
+      }
+    },
+    "classReports": {
+      "description": "Daily or session-wise class reports filed by mentors",
+      "fields": {
+        "studentId": { "type": "string", "description": "Student ID" },
+        "mentorId": { "type": "string", "description": "Mentor ID" },
+        "mentorName": { "type": "string", "description": "Mentor Name" },
+        "date": { "type": "string", "description": "Class date (YYYY-MM-DD)" },
+        "subject": { "type": "string", "description": "Subject taught" },
+        "topicCovered": { "type": "string", "description": "Topic covered" },
+        "subtopics": { "type": "string", "description": "Subtopics" },
+        "homework": { "type": "string", "description": "Homework given" },
+        "studentUnderstanding": { "type": "string", "description": "Excellent | Good | Average | Needs Improvement" },
+        "classParticipation": { "type": "string", "description": "High | Medium | Low" },
+        "difficulties": { "type": "string", "description": "Struggles encountered" },
+        "nextClassPlan": { "type": "string", "description": "Next class plan" },
+        "mentorRemarks": { "type": "string", "description": "Detailed remarks" },
+        "createdAt": { "type": "string", "description": "Report timestamp" }
+      }
+    },
+    "attendance": {
+      "description": "Student attendance records per session",
+      "fields": {
+        "studentId": { "type": "string", "description": "Student ID" },
+        "mentorId": { "type": "string", "description": "Mentor ID" },
+        "date": { "type": "string", "description": "Date" },
+        "time": { "type": "string", "description": "Time slot" },
+        "status": { "type": "string", "description": "Present | Absent | Rescheduled" },
+        "remarks": { "type": "string", "description": "Session note" }
+      }
+    },
+    "homework": {
+      "description": "Homework assigned and submitted",
+      "fields": {
+        "studentId": { "type": "string", "description": "Student ID" },
+        "mentorId": { "type": "string", "description": "Mentor ID" },
+        "subject": { "type": "string", "description": "Subject" },
+        "topic": { "type": "string", "description": "Topic" },
+        "description": { "type": "string", "description": "Homework tasks" },
+        "dueDate": { "type": "string", "description": "Due date" },
+        "submissionStatus": { "type": "string", "description": "Pending | Submitted | Reviewed" },
+        "submissionText": { "type": "string", "description": "Student answer / submission" },
+        "mentorFeedback": { "type": "string", "description": "Mentor evaluation" },
+        "marksAwarded": { "type": "number", "description": "Marks awarded" },
+        "createdAt": { "type": "string", "description": "Assignment timestamp" }
+      }
+    },
+    "weeklyExams": {
+      "description": "BBA Mentors weekly standardized assessments",
+      "fields": {
+        "examName": { "type": "string", "description": "Exam title" },
+        "weekNumber": { "type": "number", "description": "Week number" },
+        "classGrade": { "type": "string", "description": "Grade / Class" },
+        "board": { "type": "string", "description": "BSEB | CBSE | ICSE" },
+        "subject": { "type": "string", "description": "Subject" },
+        "chapter": { "type": "string", "description": "Chapter name" },
+        "topics": { "type": "array", "description": "Topics evaluated" },
+        "totalMarks": { "type": "number", "description": "Total marks" },
+        "durationMinutes": { "type": "number", "description": "Time limit" },
+        "questionCount": { "type": "number", "description": "Number of questions" },
+        "examDate": { "type": "string", "description": "Scheduled exam date" },
+        "difficulty": { "type": "string", "description": "Easy | Medium | Hard" },
+        "instructions": { "type": "string", "description": "Exam instructions" },
+        "questions": { "type": "array", "description": "Questions list with answers" },
+        "status": { "type": "string", "description": "Published | Draft | Archived" }
+      }
+    },
+    "examAttempts": {
+      "description": "Student test attempts and auto-evaluated scorecards",
+      "fields": {
+        "examId": { "type": "string", "description": "Exam ID" },
+        "examName": { "type": "string", "description": "Exam name" },
+        "subject": { "type": "string", "description": "Subject" },
+        "studentId": { "type": "string", "description": "Student ID" },
+        "startedAt": { "type": "string", "description": "Start timestamp" },
+        "submittedAt": { "type": "string", "description": "Submission timestamp" },
+        "answers": { "type": "map", "description": "Selected answers map" },
+        "marksObtained": { "type": "number", "description": "Score obtained" },
+        "totalMarks": { "type": "number", "description": "Total marks possible" },
+        "percentage": { "type": "number", "description": "Score percentage" },
+        "correctCount": { "type": "number", "description": "Correct answers" },
+        "wrongCount": { "type": "number", "description": "Incorrect answers" },
+        "skippedCount": { "type": "number", "description": "Skipped questions" },
+        "topicPerformance": { "type": "map", "description": "Performance by topic" },
+        "previousScore": { "type": "number", "description": "Prior assessment score" },
+        "scoreDifference": { "type": "number", "description": "Delta from prior test" },
+        "improvementStatus": { "type": "string", "description": "Improved | Stable | Needs Attention" }
+      }
+    },
+    "notifications": {
+      "description": "Real-time alerts for parents, mentors, and admin",
+      "fields": {
+        "userId": { "type": "string", "description": "Recipient user ID" },
+        "role": { "type": "string", "description": "Recipient role" },
+        "title": { "type": "string", "description": "Notification title" },
+        "message": { "type": "string", "description": "Alert body" },
+        "type": { "type": "string", "description": "Type of event" },
+        "read": { "type": "boolean", "description": "Read flag" },
+        "createdAt": { "type": "string", "description": "Timestamp" }
+      }
+    },
+    "supportTickets": {
+      "description": "Parent and Mentor support inquiries",
+      "fields": {
+        "userId": { "type": "string", "description": "Submitter ID" },
+        "userName": { "type": "string", "description": "Submitter name" },
+        "role": { "type": "string", "description": "Role" },
+        "subject": { "type": "string", "description": "Ticket subject" },
+        "message": { "type": "string", "description": "Issue description" },
+        "status": { "type": "string", "description": "Open | In Progress | Resolved" },
+        "priority": { "type": "string", "description": "Normal | High | Urgent" },
+        "response": { "type": "string", "description": "Admin response" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" }
+      }
+    }
+  }
+}

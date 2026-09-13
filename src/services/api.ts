@@ -31,25 +31,50 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     ...(options.headers || {}),
   };
 
-  const response = await fetch(url, {
-    ...options,
-    headers,
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers,
+    });
+  } catch (err: any) {
+    console.warn(`[BBA API] Request failed for ${endpoint}:`, err?.message || err);
+    throw new Error(err?.message || 'Server connection issue. Please check your connection and try again.');
+  }
 
   if (!response.ok) {
     let errorMsg = `HTTP Error ${response.status}`;
     try {
-      const errJson = await response.json();
-      if (errJson.error) {
-        errorMsg = errJson.error;
+      const text = await response.text();
+      try {
+        const errJson = JSON.parse(text);
+        if (errJson.error) {
+          errorMsg = errJson.error;
+        } else if (errJson.message) {
+          errorMsg = errJson.message;
+        }
+      } catch {
+        if (text && text.length < 300 && !text.includes('<!doctype') && !text.includes('<html')) {
+          errorMsg = text;
+        }
       }
     } catch {
-      // Ignore JSON parse error
+      // Ignore reading error
     }
     throw new Error(errorMsg);
   }
 
-  return response.json();
+  const contentType = response.headers.get('content-type') || '';
+  if (contentType.includes('application/json')) {
+    return response.json();
+  }
+
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return text as unknown as T;
+  }
 }
 
 export const api = {
@@ -73,6 +98,22 @@ export const api = {
     }),
 
   getCurrentUser: () => request<{ user: User; profile: any }>('/auth/me'),
+
+  syncFirebaseUser: (data: {
+    uid: string;
+    email: string;
+    role: string;
+    name: string;
+    mobile?: string;
+    district?: string;
+    city?: string;
+    state?: string;
+    profileData?: any;
+  }) =>
+    request<{ token: string; user: User & { profileId?: string } }>('/auth/firebase-sync', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
 
   // Parent Endpoints
   getParentChildren: (parentId?: string) =>

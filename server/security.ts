@@ -68,20 +68,21 @@ export function securityHeadersMiddleware(req: Request, res: Response, next: Nex
   // Prevent MIME type sniffing
   res.setHeader('X-Content-Type-Options', 'nosniff');
 
+  // Do NOT set X-Frame-Options: SAMEORIGIN because the app runs inside an iframe preview in AI Studio
+  // Enable frame ancestors to allow embedding in AI Studio preview
+  res.setHeader(
+    'Content-Security-Policy',
+    "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: wss: ws: http:; frame-ancestors *;"
+  );
+
   // XSS protection for older browsers
   res.setHeader('X-XSS-Protection', '1; mode=block');
 
   // Referrer policy: send origin only on cross-origin HTTPS
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
-  // Restrict unused browser APIs
+  // Allow necessary browser capabilities
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-
-  // Content Security Policy - allow frame embedding for AI Studio preview iframe
-  res.setHeader(
-    'Content-Security-Policy',
-    "default-src 'self' 'unsafe-inline' data: blob: https:; img-src 'self' data: blob: https:; font-src 'self' data: https:; connect-src 'self' https: ws: wss:; frame-ancestors *;"
-  );
 
   next();
 }

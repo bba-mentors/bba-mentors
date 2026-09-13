@@ -33,8 +33,9 @@ import {
   CheckSquare,
 } from 'lucide-react';
 import { api } from '../../services/api.ts';
-import { ALL_38_BIHAR_DISTRICTS, TOTAL_BIHAR_DISTRICTS_COUNT } from '../../data/biharDistricts.ts';
-import { ALL_ACADEMIC_CLASSES } from '../../data/academicClasses.ts';
+import { firestoreService } from '../../services/firestoreService.ts';
+import { BIHAR_38_DISTRICTS } from '../../data/biharDistricts.ts';
+import { BIHAR_SCHOOL_CLASSES } from '../../data/classes.ts';
 
 interface HomeTuitionProps {
   onNavigate: (view: string, data?: any) => void;
@@ -48,11 +49,11 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
     childName: '',
     classGrade: 'Class 10',
     board: 'CBSE',
-    subjects: 'Mathematics & Science',
+    subjects: '',
     district: 'Patna',
-    cityArea: 'Boring Road',
+    cityArea: '',
     preferredGender: 'Any',
-    preferredTiming: 'Evening (5:00 PM - 7:00 PM)',
+    preferredTiming: '',
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -60,20 +61,20 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
   // Interactive UI State
   const [activeFaq, setActiveFaq] = useState<number | null>(0);
   const [activeApproachTab, setActiveApproachTab] = useState<'diagnostic' | 'board' | 'remedial' | 'habit' | 'exam'>('board');
-  const [activeClassTab, setActiveClassTab] = useState<'all' | 'primary' | 'middle' | 'secondary' | 'senior'>('secondary');
+  const [activeClassTab, setActiveClassTab] = useState<'all' | 'pre-primary' | 'primary' | 'middle' | 'secondary'>('secondary');
   const [selectedProcessStep, setSelectedProcessStep] = useState(0);
 
   // Tuition Fee Calculator State
-  const [calcClass, setCalcClass] = useState<'primary' | 'middle' | 'secondary' | 'senior'>('secondary');
+  const [calcClass, setCalcClass] = useState<'pre-primary' | 'primary' | 'middle' | 'secondary'>('secondary');
   const [calcDays, setCalcDays] = useState<number>(5);
   const [calcHours, setCalcHours] = useState<number>(1.5);
 
   const calculateEstimate = () => {
     let baseRate = 250; // per hour
+    if (calcClass === 'pre-primary') baseRate = 180;
     if (calcClass === 'primary') baseRate = 200;
     if (calcClass === 'middle') baseRate = 240;
     if (calcClass === 'secondary') baseRate = 300;
-    if (calcClass === 'senior') baseRate = 380;
 
     const hoursPerMonth = calcDays * 4.3 * calcHours;
     const estimatedFee = Math.round(hoursPerMonth * baseRate);
@@ -103,6 +104,17 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
         city: demoForm.cityArea,
         notes: `Preferred Timing: ${demoForm.preferredTiming}. Preferred Gender: ${demoForm.preferredGender}. Booked from Home Tuition In-Depth Page.`,
       });
+
+      // Persist to Firebase Firestore collection
+      await firestoreService.saveDemoBooking({
+        parentName: demoForm.parentName,
+        parentMobile: demoForm.mobile,
+        studentClass: demoForm.classGrade,
+        district: demoForm.district,
+        mode: 'Home Tuition',
+        preferredSubject: demoForm.subjects,
+      });
+
       setSubmitted(true);
     } catch (err) {
       console.error('Demo booking error:', err);
@@ -141,7 +153,7 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
       districtKey: 'Bhagalpur',
       tutorsCount: '60+ Tutors',
       areas: 'Tilka Manjhi, Adampur, Zero Mile, Khanjarpur, Nathnagar, Barari, Aliganj, Mirjanhat',
-      highlight: 'मैट्रिक व इंटरमीडिएट टॉपर मार्गदर्शक',
+      highlight: 'मैट्रिक व बोर्ड परीक्षा टॉपर मार्गदर्शक',
     },
     {
       name: 'Darbhanga (दरभंगा)',
@@ -183,12 +195,12 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
       district: 'Patna',
       locality: 'Boring Road / Kankarbagh',
       subjects: ['Mathematics', 'Physics', 'Science'],
-      grades: 'Class 9 - 12 (CBSE & BSEB)',
+      grades: 'Class 8 - 10 (CBSE & BSEB)',
       rating: 4.9,
       reviewsCount: 38,
       hourlyRate: '₹350 / घंटा',
       badge: 'Board Rank Producer',
-      bio: 'BSEB मैट्रिक और CBSE कक्षा 10वीं व 12वीं के 40 से अधिक छात्रों को 90%+ अंक दिलवा चुके हैं। गणित के मुश्किल सूत्रों को सरल उदाहरणों से समझाते हैं।',
+      bio: 'BSEB मैट्रिक और CBSE कक्षा 10वीं के 40 से अधिक छात्रों को 90%+ अंक दिलवा चुके हैं। गणित के मुश्किल सूत्रों को सरल उदाहरणों से समझाते हैं।',
     },
     {
       id: 'm2',
@@ -335,7 +347,7 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
     },
     {
       q: 'क्या बिहार बोर्ड (BSEB हिंदी/अंग्रेजी माध्यम) और CBSE/ICSE दोनों के शिक्षक मिलते हैं?',
-      a: 'हाँ! हमारे पास बिहार बोर्ड (BSEB मैट्रिक व इंटरमीडिएट) के विशेषज्ञ शिक्षक हैं जो NCERT/BTBC किताबों, पिछले 10 वर्षों के प्रश्नपत्रों और 50% OMR ऑब्जेक्टिव पैटर्न में पारंगत हैं। साथ ही CBSE और ICSE के कॉन्सेप्ट-बेस्ड व अंग्रेजी माध्यम में दक्ष शिक्षक भी उपलब्ध हैं।',
+      a: 'हाँ! हमारे पास बिहार बोर्ड (BSEB मैट्रिक व प्राथमिक/मध्य) के विशेषज्ञ शिक्षक हैं जो NCERT/BTBC किताबों, पिछले 10 वर्षों के प्रश्नपत्रों और 50% OMR ऑब्जेक्टिव पैटर्न में पारंगत हैं। साथ ही CBSE और ICSE के कॉन्सेप्ट-बेस्ड व अंग्रेजी माध्यम में दक्ष शिक्षक भी उपलब्ध हैं।',
     },
     {
       q: 'होम ट्यूशन की फीस कितनी होती है और इसका भुगतान कैसे होता है?',
@@ -480,7 +492,7 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
                     </div>
                   </div>
                 ) : (
-                  <form onSubmit={handleDemoSubmit} className="space-y-3 text-xs">
+                  <form onSubmit={handleDemoSubmit} autoComplete="off" className="space-y-3 text-xs">
                     <div>
                       <label className="font-bold text-slate-700 block mb-1">
                         अभिभावक का नाम (Parent Name) *
@@ -531,10 +543,8 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
                           onChange={(e) => setDemoForm({ ...demoForm, classGrade: e.target.value })}
                           className="w-full px-2.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-900 bg-white text-xs font-medium"
                         >
-                          {ALL_ACADEMIC_CLASSES.map((c) => (
-                            <option key={c} value={c}>
-                              {c}
-                            </option>
+                          {BIHAR_SCHOOL_CLASSES.map((c) => (
+                            <option key={c} value={c}>{c}</option>
                           ))}
                         </select>
                       </div>
@@ -555,20 +565,16 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
 
                     <div className="grid grid-cols-2 gap-2">
                       <div>
-                        <div className="flex justify-between items-center mb-1">
-                          <label className="font-bold text-slate-700 block">
-                            जिला (District - All {TOTAL_BIHAR_DISTRICTS_COUNT} Active)
-                          </label>
-                        </div>
+                        <label className="font-bold text-slate-700 block mb-1">
+                          जिला (District in Bihar)
+                        </label>
                         <select
                           value={demoForm.district}
                           onChange={(e) => setDemoForm({ ...demoForm, district: e.target.value })}
                           className="w-full px-2.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-blue-900 bg-white text-xs font-medium"
                         >
-                          {ALL_38_BIHAR_DISTRICTS.map((d) => (
-                            <option key={d.id} value={d.name}>
-                              {d.name} {d.hindiName ? `(${d.hindiName})` : ''}
-                            </option>
+                          {BIHAR_38_DISTRICTS.map((d) => (
+                            <option key={d.name} value={d.name}>{d.name} ({d.hindiName})</option>
                           ))}
                         </select>
                       </div>
@@ -988,7 +994,7 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
                   <div className="p-6 rounded-2xl bg-amber-50/50 border border-amber-200 space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-extrabold uppercase text-amber-900 bg-amber-200/60 px-2.5 py-1 rounded-md">
-                        BSEB (मैट्रिक व इंटरमीडिएट)
+                        BSEB (मैट्रिक व प्राथमिक/मध्य)
                       </span>
                       <span className="text-xs font-bold text-amber-800">हिंदी / इंग्लिश माध्यम</span>
                     </div>
@@ -1154,7 +1160,7 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
             हर कक्षा के लिए समर्पित होम ट्यूशन पाठ्यक्रम
           </h2>
           <p className="text-slate-600 text-sm sm:text-base">
-            कक्षा 1 से लेकर 12वीं तक, हर उम्र और कक्षा की शैक्षणिक जरूरतें अलग होती हैं:
+            नर्सरी से लेकर 10वीं बोर्ड तक, हर उम्र और कक्षा की शैक्षणिक जरूरतें अलग होती हैं:
           </p>
         </div>
 
@@ -1162,10 +1168,10 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
         <div className="flex flex-wrap justify-center gap-2 max-w-3xl mx-auto">
           {[
             { id: 'all', label: 'सभी वर्ग (All Wings)' },
+            { id: 'pre-primary', label: 'पूर्व-प्राथमिक (Nursery, LKG, UKG)' },
             { id: 'primary', label: 'वर्ग 1 - 5 (Primary)' },
             { id: 'middle', label: 'वर्ग 6 - 8 (Middle)' },
             { id: 'secondary', label: 'वर्ग 9 - 10 (Matric/Board)' },
-            { id: 'senior', label: 'वर्ग 11 - 12 (Intermediate)' },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -1183,23 +1189,65 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
 
         {/* Wing Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {(activeClassTab === 'all' || activeClassTab === 'primary') && (
+          {(activeClassTab === 'all' || activeClassTab === 'pre-primary') && (
             <div className="p-6 rounded-3xl bg-white border border-slate-200 space-y-4 shadow-sm hover:shadow-xl transition flex flex-col justify-between">
               <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center font-black text-xs text-center leading-tight">
-                  Nur - 5
+                <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-900 flex items-center justify-center font-black text-xs text-center px-1">
+                  Nur - UKG
                 </div>
                 <div>
-                  <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wide">
-                    प्रारंभिक एवं नींव विकास (Foundation)
+                  <span className="text-[11px] font-bold text-rose-800 uppercase tracking-wide">
+                    प्रारंभिक विकास (Early Childhood)
                   </span>
-                  <h3 className="text-lg font-black text-slate-900">नर्सरी से 5वीं (Nursery to Class 5)</h3>
+                  <h3 className="text-lg font-black text-slate-900">पूर्व-प्राथमिक (Nursery, LKG, UKG)</h3>
                 </div>
                 <ul className="space-y-2 text-xs text-slate-600">
                   <li className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>नर्सरी, LKG, UKG के लिए फोॅनिक्स (Phonics), वर्णमाला व अक्षराभ्यास</span>
+                    <span>खेल-खेल में अक्षरों (Phonics) व अंकों (Counting) की पहचान</span>
                   </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>पेंसिल पकड़ने की सही आदत व सुंदर लिखावट की नींव</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>हिंदी व अंग्रेजी बाल कविताएं (Rhymes) और संवाद कौशल</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                    <span>धैर्यवान व स्नेहमयी महिला शिक्षिकाओं की विशेष व्यवस्था</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                <button
+                  onClick={() => onNavigate('find-mentor', { classGrade: 'Nursery', mode: 'Home Tuition' })}
+                  className="text-xs font-bold text-blue-900 hover:text-blue-950 flex items-center gap-1"
+                >
+                  <span>पूर्व-प्राथमिक ट्यूटर देखें</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+                <a href="#book-home-demo" className="text-[11px] font-semibold text-amber-700 hover:underline">
+                  डेमो मांगें
+                </a>
+              </div>
+            </div>
+          )}
+
+          {(activeClassTab === 'all' || activeClassTab === 'primary') && (
+            <div className="p-6 rounded-3xl bg-white border border-slate-200 space-y-4 shadow-sm hover:shadow-xl transition flex flex-col justify-between">
+              <div className="space-y-4">
+                <div className="w-12 h-12 rounded-2xl bg-amber-100 text-amber-900 flex items-center justify-center font-black text-base">
+                  1-5
+                </div>
+                <div>
+                  <span className="text-[11px] font-bold text-amber-800 uppercase tracking-wide">
+                    नींव का विकास (Foundation)
+                  </span>
+                  <h3 className="text-lg font-black text-slate-900">प्राथमिक वर्ग (Class 1 to 5)</h3>
+                </div>
+                <ul className="space-y-2 text-xs text-slate-600">
                   <li className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                     <span>सुंदर लिखावट (Handwriting) व शुद्ध उच्चारण का अभ्यास</span>
@@ -1214,16 +1262,16 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
                   </li>
                   <li className="flex items-start gap-2">
                     <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>धैर्यवान महिला शिक्षिका (Female Home Tutors) की विशेष उपलब्धता</span>
+                    <span>धैर्यवान महिला शिक्षिका की विशेष उपलब्धता</span>
                   </li>
                 </ul>
               </div>
               <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
                 <button
-                  onClick={() => onNavigate('find-mentor', { classGrade: 'Class 1', mode: 'Home Tuition' })}
+                  onClick={() => onNavigate('find-mentor', { classGrade: 'Class 1-5', mode: 'Home Tuition' })}
                   className="text-xs font-bold text-blue-900 hover:text-blue-950 flex items-center gap-1"
                 >
-                  <span>नर्सरी व 1-5 ट्यूटर देखें</span>
+                  <span>प्राइमरी ट्यूटर देखें</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
                 <a href="#book-home-demo" className="text-[11px] font-semibold text-amber-700 hover:underline">
@@ -1328,51 +1376,7 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
             </div>
           )}
 
-          {(activeClassTab === 'all' || activeClassTab === 'senior') && (
-            <div className="p-6 rounded-3xl bg-white border border-slate-200 space-y-4 shadow-sm hover:shadow-xl transition flex flex-col justify-between">
-              <div className="space-y-4">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-900 flex items-center justify-center font-black text-base">
-                  11-12
-                </div>
-                <div>
-                  <span className="text-[11px] font-bold text-emerald-800 uppercase tracking-wide">
-                    इंटरमीडिएट + JEE/NEET
-                  </span>
-                  <h3 className="text-lg font-black text-slate-900">उच्च माध्यमिक (Class 11 & 12)</h3>
-                </div>
-                <ul className="space-y-2 text-xs text-slate-600">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>साइंस (Physics, Chemistry, Maths/Biology) गहन 1-on-1 अध्ययन</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>कॉमर्स (Accountancy, Economics, Business Studies) विशेषज्ञ</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>NIT पटना एवं शीर्ष विश्वविद्यालयों के पूर्व छात्रों द्वारा मार्गदर्शन</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                    <span>इंटर बोर्ड टॉपर बनने हेतु न्यूमेरिकल व थ्योरी संतुलन</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
-                <button
-                  onClick={() => onNavigate('find-mentor', { classGrade: 'Class 12', mode: 'Home Tuition' })}
-                  className="text-xs font-bold text-blue-900 hover:text-blue-950 flex items-center gap-1"
-                >
-                  <span>इंटरमीडिएट ट्यूटर देखें</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-                <a href="#book-home-demo" className="text-[11px] font-semibold text-amber-700 hover:underline">
-                  डेमो मांगें
-                </a>
-              </div>
-            </div>
-          )}
+
         </div>
       </section>
 
@@ -1403,10 +1407,10 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
                 </label>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   {[
+                    { id: 'pre-primary', label: 'Pre-Primary (Nur-UKG)' },
                     { id: 'primary', label: 'Primary (1-5)' },
                     { id: 'middle', label: 'Middle (6-8)' },
                     { id: 'secondary', label: 'Matric (9-10)' },
-                    { id: 'senior', label: 'Senior (11-12)' },
                   ].map((c) => (
                     <button
                       key={c.id}
@@ -1809,27 +1813,39 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
           ))}
         </div>
 
-        {/* All 38 Districts State-Wide Guarantee Callout */}
-        <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-blue-950 to-slate-900 text-white flex flex-col sm:flex-row items-center justify-between gap-6 border border-amber-400/30 shadow-lg">
-          <div className="space-y-2 text-center sm:text-left">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-black uppercase tracking-wider">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-              <span>100% State Coverage • All 38 Districts Active</span>
+        {/* Complete 38 Bihar Districts Grid Directory */}
+        <div className="p-6 rounded-3xl bg-white border border-slate-200 shadow-sm space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+            <div>
+              <h3 className="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-blue-900" />
+                <span>बिहार के सभी 38 जिलों में होम ट्यूशन नेटवर्क (All 38 Bihar Districts)</span>
+              </h3>
+              <p className="text-xs text-slate-500">
+                अपने जिले पर क्लिक करें और अपने नजदीकी सत्यापित शिक्षकों से सीधे संपर्क करें।
+              </p>
             </div>
-            <h3 className="text-xl sm:text-2xl font-black text-white">
-              क्या आपका जिला ऊपर सूचीबद्ध नहीं है? हम बिहार के सभी 38 जिलों में सक्रिय हैं!
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
-              किशनगंज, अरवल, मधुबनी, पश्चिम चम्पारण, रोहतास, सहरसा, सीवान और कैमूर सहित बिहार के प्रत्येक 38 जिलों में हमारे योग्य होम ट्यूटर और ऑनलाइन मेंटर उपलब्ध हैं।
-            </p>
+            <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200 font-bold text-xs self-start sm:self-auto">
+              38 / 38 Districts Covered
+            </span>
           </div>
-          <button
-            onClick={() => onNavigate('classes-boards', { tab: 'locations' })}
-            className="px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-blue-950 font-black text-xs sm:text-sm rounded-xl transition shadow-md whitespace-nowrap flex items-center gap-2 shrink-0"
-          >
-            <span>सभी 38 जिलों की डायरेक्टरी देखें</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2">
+            {BIHAR_38_DISTRICTS.map((d) => (
+              <button
+                key={d.name}
+                onClick={() => onNavigate('find-mentor', { district: d.name, mode: 'Home Tuition' })}
+                className="p-2.5 rounded-xl border border-slate-200 hover:border-blue-900 hover:bg-blue-50/50 transition text-left group"
+              >
+                <div className="text-xs font-bold text-slate-900 group-hover:text-blue-900 truncate">
+                  {d.name}
+                </div>
+                <div className="text-[11px] text-slate-400 truncate">
+                  {d.hindiName}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -1868,10 +1884,10 @@ export function HomeTuitionPage({ onNavigate }: HomeTuitionProps) {
               },
               {
                 name: 'महेश प्रसाद वर्मा',
-                loc: 'एपी कॉलोनी, गया • पिता (Class 12 Science PCM)',
-                score: '+14% स्कोर वृद्धि',
+                loc: 'मिरचाईबाड़ी, कटिहार • पिता (Class 10 Matric Board)',
+                score: '+18% स्कोर वृद्धि',
                 quote:
-                  'इंटरमीडिएट में फिजिक्स और मैथ्स बहुत कठिन लग रहा था। BBA Mentors के इंजीनियर ट्यूटर ने न सिर्फ बोर्ड बल्कि बेसिक कॉन्सेप्ट भी बहुत साफ समझाए। सिस्टम बहुत पारदर्शी और ईमानदार है।',
+                  'मैट्रिक बोर्ड परीक्षा में विज्ञान और गणित बहुत कठिन लग रहा था। BBA Mentors के समर्पित ट्यूटर ने न सिर्फ बोर्ड बल्कि बेसिक कॉन्सेप्ट भी बहुत साफ समझाए। साप्ताहिक टेस्ट सीरीज से डर खत्म हुआ और शानदार अंक आए।',
               },
             ].map((t, idx) => (
               <div

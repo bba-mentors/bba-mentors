@@ -20,8 +20,8 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { api } from '../../services/api.ts';
-import { ALL_38_BIHAR_DISTRICTS, TOTAL_BIHAR_DISTRICTS_COUNT } from '../../data/biharDistricts.ts';
-import { ALL_ACADEMIC_CLASSES } from '../../data/academicClasses.ts';
+import { BIHAR_38_DISTRICTS } from '../../data/biharDistricts.ts';
+import { BIHAR_SCHOOL_CLASSES } from '../../data/classes.ts';
 
 interface HomePageProps {
   onNavigate: (view: string, data?: any) => void;
@@ -34,7 +34,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
     studentClass: 'Class 10',
     board: 'CBSE',
     district: 'Patna',
-    city: 'Patna',
+    city: '',
   });
   const [demoSubmitting, setDemoSubmitting] = useState(false);
   const [demoSubmitted, setDemoSubmitted] = useState(false);
@@ -105,22 +105,18 @@ export function HomePage({ onNavigate }: HomePageProps) {
               </div>
 
               {/* Trust Indicators */}
-              <div className="pt-6 grid grid-cols-2 sm:grid-cols-4 gap-4 border-t border-slate-200 text-slate-700">
+              <div className="pt-6 grid grid-cols-3 gap-4 border-t border-slate-200 text-slate-700">
                 <div>
                   <div className="text-xl sm:text-2xl font-black text-slate-900">100%</div>
                   <div className="text-xs text-slate-500 font-medium">Verified Mentor Profiles</div>
-                </div>
-                <div>
-                  <div className="text-xl sm:text-2xl font-black text-blue-900">All 38</div>
-                  <div className="text-xs text-slate-500 font-medium">Bihar Districts Active</div>
                 </div>
                 <div>
                   <div className="text-xl sm:text-2xl font-black text-slate-900">Weekly</div>
                   <div className="text-xs text-slate-500 font-medium">Standard Assessments</div>
                 </div>
                 <div>
-                  <div className="text-xl sm:text-2xl font-black text-emerald-700">+7% to +15%</div>
-                  <div className="text-xs text-slate-500 font-medium">Measured Improvement</div>
+                  <div className="text-xl sm:text-2xl font-black text-blue-800">+7% to +15%</div>
+                  <div className="text-xs text-slate-500 font-medium">Measurable Improvement</div>
                 </div>
               </div>
             </div>
@@ -376,16 +372,22 @@ export function HomePage({ onNavigate }: HomePageProps) {
 
           {/* City Quick Links */}
           <div className="pt-2 border-t border-white/10 flex flex-wrap items-center gap-2 text-xs">
-            <span className="text-slate-400 font-semibold">होम ट्यूटर उपलब्ध:</span>
-            {['पटना (Patna)', 'गया (Gaya)', 'मुजफ्फरपुर (Muzaffarpur)', 'भागलपुर (Bhagalpur)', 'दरभंगा (Darbhanga)', 'पूर्णिया (Purnia)', 'बेगूसराय (Begusarai)', 'आरा (Ara)'].map((city) => (
+            <span className="text-slate-400 font-semibold">बिहार के सभी 38 जिलों में होम ट्यूटर:</span>
+            {BIHAR_38_DISTRICTS.slice(0, 8).map((d) => (
               <button
-                key={city}
-                onClick={() => onNavigate('home-tuition')}
+                key={d.name}
+                onClick={() => onNavigate('find-mentor', { district: d.name })}
                 className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200 transition font-medium text-[11px]"
               >
-                {city}
+                {d.hindiName} ({d.name})
               </button>
             ))}
+            <button
+              onClick={() => onNavigate('locations')}
+              className="px-2.5 py-1 rounded-lg bg-amber-400/20 hover:bg-amber-400/30 text-amber-300 border border-amber-400/40 transition font-bold text-[11px]"
+            >
+              + सभी 38 जिले देखें →
+            </button>
           </div>
         </div>
       </section>
@@ -409,7 +411,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             {[
               {
                 title: 'Personalized Home Tuition',
-                desc: '1-on-1 focused instruction at the safety of your home across all 38 Bihar districts.',
+                desc: '1-on-1 focused instruction at the safety of your home across major Bihar districts.',
                 icon: BookOpen,
               },
               {
@@ -660,7 +662,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleDemoSubmit} className="space-y-3.5 text-left">
+                <form onSubmit={handleDemoSubmit} autoComplete="off" className="space-y-3.5 text-left">
                   <div>
                     <label className="block text-xs font-semibold text-slate-700 mb-1">
                       Parent's Full Name *
@@ -668,7 +670,8 @@ export function HomePage({ onNavigate }: HomePageProps) {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Rajesh Sharma"
+                      autoComplete="off"
+                      placeholder="Enter parent's full name"
                       value={demoForm.parentName}
                       onChange={(e) => setDemoForm({ ...demoForm, parentName: e.target.value })}
                       className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:outline-none"
@@ -698,7 +701,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                         onChange={(e) => setDemoForm({ ...demoForm, studentClass: e.target.value })}
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:outline-none"
                       >
-                        {ALL_ACADEMIC_CLASSES.map((c) => (
+                        {BIHAR_SCHOOL_CLASSES.map((c) => (
                           <option key={c} value={c}>{c}</option>
                         ))}
                       </select>
@@ -721,27 +724,16 @@ export function HomePage({ onNavigate }: HomePageProps) {
                       </select>
                     </div>
                     <div>
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="block text-xs font-semibold text-slate-700">
-                          Bihar District ({TOTAL_BIHAR_DISTRICTS_COUNT} Active)
-                        </label>
-                        <button
-                          type="button"
-                          onClick={() => onNavigate('classes-boards', { tab: 'locations' })}
-                          className="text-[11px] text-blue-900 font-bold hover:underline"
-                        >
-                          View All 38
-                        </button>
-                      </div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">
+                        Bihar District
+                      </label>
                       <select
                         value={demoForm.district}
                         onChange={(e) => setDemoForm({ ...demoForm, district: e.target.value, city: e.target.value })}
                         className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-900 focus:outline-none"
                       >
-                        {ALL_38_BIHAR_DISTRICTS.map((d) => (
-                          <option key={d.id} value={d.name}>
-                            {d.name} {d.hindiName ? `(${d.hindiName})` : ''}
-                          </option>
+                        {BIHAR_38_DISTRICTS.map((d) => (
+                          <option key={d.name} value={d.name}>{d.name} ({d.hindiName})</option>
                         ))}
                       </select>
                     </div>

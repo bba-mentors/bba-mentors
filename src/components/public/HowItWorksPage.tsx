@@ -21,7 +21,7 @@ export function HowItWorksPage({ onNavigate }: HowItWorksProps) {
     {
       num: '01',
       title: 'Parent Registration & Academic Assessment Needs',
-      desc: 'Parents specify the student’s class (Class 1 to 12), education board (BSEB, CBSE, ICSE), specific subjects needing help, residential locality, and preferred class timings.',
+      desc: 'Parents specify the student’s class (Nursery to Class 10), education board (BSEB, CBSE, ICSE), specific subjects needing help, residential locality, and preferred class timings.',
       detail: 'Includes previous term marks and areas where the student is struggling so we prepare a tailored diagnostic baseline.',
       badge: 'Step 1',
     },

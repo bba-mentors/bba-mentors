@@ -12,8 +12,8 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
-import { ALL_38_BIHAR_DISTRICTS } from '../../data/biharDistricts.ts';
-import { ALL_ACADEMIC_CLASSES } from '../../data/academicClasses.ts';
+import { BIHAR_38_DISTRICTS } from '../../data/biharDistricts.ts';
+import { BIHAR_SCHOOL_CLASSES } from '../../data/classes.ts';
 
 interface AuthPageProps {
   onNavigate: (view: string, data?: any) => void;
@@ -31,15 +31,15 @@ export function ParentRegisterPage({ onNavigate, onSuccess }: AuthPageProps) {
     mobile: '',
     password: '',
     district: 'Patna',
-    city: 'Patna',
-    address: 'Boring Road',
+    city: '',
+    address: '',
     // Child info
     childName: '',
     classGrade: 'Class 10',
     board: 'CBSE',
-    schoolName: 'St. Michael’s High School, Patna',
-    targetSubjects: 'Mathematics, Science',
-    weakSubjects: 'Mathematics',
+    schoolName: '',
+    targetSubjects: '',
+    weakSubjects: '',
   });
 
   const handleSubmit = async (e: FormEvent) => {
@@ -104,7 +104,7 @@ export function ParentRegisterPage({ onNavigate, onSuccess }: AuthPageProps) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
           <div className="space-y-3">
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 border-b pb-1">
               Parent Details
@@ -161,18 +161,14 @@ export function ParentRegisterPage({ onNavigate, onSuccess }: AuthPageProps) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
-                  Bihar District ({ALL_38_BIHAR_DISTRICTS.length}) *
-                </label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Bihar District *</label>
                 <select
                   value={form.district}
                   onChange={(e) => setForm({ ...form, district: e.target.value, city: e.target.value })}
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                 >
-                  {ALL_38_BIHAR_DISTRICTS.map((d) => (
-                    <option key={d.id} value={d.name}>
-                      {d.name} {d.hindiName ? `(${d.hindiName})` : ''}
-                    </option>
+                  {BIHAR_38_DISTRICTS.map((d) => (
+                    <option key={d.name} value={d.name}>{d.name} ({d.hindiName})</option>
                   ))}
                 </select>
               </div>
@@ -213,7 +209,7 @@ export function ParentRegisterPage({ onNavigate, onSuccess }: AuthPageProps) {
                   onChange={(e) => setForm({ ...form, classGrade: e.target.value })}
                   className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                 >
-                  {ALL_ACADEMIC_CLASSES.map((c) => (
+                  {BIHAR_SCHOOL_CLASSES.map((c) => (
                     <option key={c} value={c}>{c}</option>
                   ))}
                 </select>
@@ -271,10 +267,24 @@ export function ParentRegisterPage({ onNavigate, onSuccess }: AuthPageProps) {
 
 // 2. PARENT LOGIN PAGE
 export function ParentLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
-  const { login, isLoading } = useAuth();
+  const { login, loginWithGoogle, isLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const handleGoogleSignIn = async () => {
+    setErrorMsg(null);
+    try {
+      await loginWithGoogle();
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        onNavigate('parent-dashboard');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Firebase Google Sign-In failed.');
+    }
+  };
 
   const handleLogin = async (e: FormEvent) => {
     e.preventDefault();
@@ -296,12 +306,6 @@ export function ParentLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
     }
   };
 
-  const fillDemo = () => {
-    setEmail('rajesh.sharma@example.com');
-    setPassword('Parent123!');
-    setErrorMsg(null);
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 py-16 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 p-8 shadow-sm text-left space-y-6">
@@ -315,31 +319,20 @@ export function ParentLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
           </p>
         </div>
 
-        {/* Demo Autofill Banner */}
-        <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-between text-xs">
-          <span className="text-blue-900 font-medium">Testing as Demo Parent?</span>
-          <button
-            type="button"
-            onClick={fillDemo}
-            className="px-2.5 py-1 bg-blue-900 text-white rounded font-bold text-[11px] hover:bg-blue-800"
-          >
-            Autofill Rajesh Sharma
-          </button>
-        </div>
-
         {errorMsg && (
           <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-semibold">
             {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} autoComplete="off" className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Email Address</label>
             <input
               type="email"
               required
-              placeholder="e.g. rajesh.sharma@example.com"
+              autoComplete="off"
+              placeholder="Enter your registered email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-900"
@@ -351,6 +344,7 @@ export function ParentLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
             <input
               type="password"
               required
+              autoComplete="off"
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -361,11 +355,46 @@ export function ParentLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-bold text-sm transition shadow"
+            className="w-full py-3 bg-blue-900 hover:bg-blue-800 text-white rounded-xl font-bold text-sm transition shadow cursor-pointer"
           >
             {isLoading ? 'Signing In...' : 'Login to Parent Portal'}
           </button>
         </form>
+
+        <div className="relative flex items-center justify-center my-2">
+          <div className="border-t border-slate-200 w-full"></div>
+          <span className="bg-white px-2 text-[11px] font-semibold text-slate-400 uppercase tracking-wider shrink-0">
+            या Firebase से जारी रखें
+          </span>
+          <div className="border-t border-slate-200 w-full"></div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleGoogleSignIn}
+          disabled={isLoading}
+          className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-300 rounded-xl font-bold text-xs text-slate-700 transition flex items-center justify-center gap-2 shadow-xs cursor-pointer"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <path
+              fill="#4285F4"
+              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+            />
+            <path
+              fill="#EA4335"
+              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+            />
+          </svg>
+          <span>Sign in with Google (Firebase)</span>
+        </button>
 
         <div className="pt-2 text-center text-xs text-slate-500 space-y-1">
           <p>
@@ -419,12 +448,6 @@ export function MentorLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
     }
   };
 
-  const fillDemo = () => {
-    setEmail('amit.kumar@bbamentors.com');
-    setPassword('Mentor123!');
-    setErrorMsg(null);
-  };
-
   return (
     <div className="min-h-screen bg-slate-50 py-16 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-2xl border border-slate-200 p-8 shadow-sm text-left space-y-6">
@@ -438,31 +461,20 @@ export function MentorLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
           </p>
         </div>
 
-        {/* Demo Autofill Banner */}
-        <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between text-xs">
-          <span className="text-emerald-900 font-medium">Demo Mentor Account:</span>
-          <button
-            type="button"
-            onClick={fillDemo}
-            className="px-2.5 py-1 bg-emerald-700 text-white rounded font-bold text-[11px] hover:bg-emerald-800"
-          >
-            Autofill Er. Amit Kumar
-          </button>
-        </div>
-
         {errorMsg && (
           <div className="p-3 bg-red-50 text-red-700 border border-red-200 rounded-lg text-xs font-semibold">
             {errorMsg}
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} autoComplete="off" className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1">Mentor Email</label>
             <input
               type="email"
               required
-              placeholder="e.g. amit.kumar@bbamentors.com"
+              autoComplete="off"
+              placeholder="Enter your registered mentor email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-700"
@@ -474,7 +486,8 @@ export function MentorLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
             <input
               type="password"
               required
-              placeholder="Enter mentor password"
+              autoComplete="off"
+              placeholder="Enter your mentor password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-700"
@@ -531,12 +544,6 @@ export function AdminLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
     }
   };
 
-  const fillDemo = () => {
-    setEmail('admin@bbamentors.com');
-    setPassword('Admin123!');
-    setErrorMsg(null);
-  };
-
   return (
     <div className="min-h-screen bg-slate-900 py-16 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-xl text-left space-y-6 text-slate-200">
@@ -546,20 +553,8 @@ export function AdminLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
           </div>
           <h2 className="text-2xl font-black text-white">BBA Mentors Staff Portal</h2>
           <p className="text-xs text-slate-400">
-            Restricted administrative system. All activities are authenticated and logged.
+            Restricted administrative system. Sirf authorized admin hi access kar sakte hain.
           </p>
-        </div>
-
-        {/* Demo Autofill Banner */}
-        <div className="p-3 bg-slate-700/60 border border-slate-600 rounded-xl flex items-center justify-between text-xs">
-          <span className="text-amber-400 font-medium">Evaluation Demo Admin:</span>
-          <button
-            type="button"
-            onClick={fillDemo}
-            className="px-2.5 py-1 bg-amber-500 text-slate-950 rounded font-bold text-[11px] hover:bg-amber-400"
-          >
-            Autofill Admin
-          </button>
         </div>
 
         {errorMsg && (
@@ -568,13 +563,15 @@ export function AdminLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="space-y-4">
+        <form onSubmit={handleLogin} autoComplete="off" className="space-y-4">
           <div>
             <label className="block text-xs font-semibold text-slate-300 mb-1">Administrative Email</label>
             <input
+              id="admin-email-input"
               type="email"
               required
-              placeholder="admin@bbamentors.com"
+              placeholder="Enter authorized admin email"
+              autoComplete="off"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 text-white rounded-lg focus:ring-2 focus:ring-amber-400 focus:outline-none"
@@ -582,11 +579,12 @@ export function AdminLoginPage({ onNavigate, onSuccess }: AuthPageProps) {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">Access Token / Password</label>
+            <label className="block text-xs font-semibold text-slate-300 mb-1">Admin Password</label>
             <input
               type="password"
               required
-              placeholder="Enter staff security key"
+              autoComplete="off"
+              placeholder="Enter admin password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 text-white rounded-lg focus:ring-2 focus:ring-amber-400 focus:outline-none"

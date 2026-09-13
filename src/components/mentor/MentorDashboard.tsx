@@ -14,14 +14,22 @@ import {
   X,
   TrendingUp,
   Phone,
+  UserCheck,
+  Edit3,
+  ExternalLink,
+  MapPin,
+  Mail,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.tsx';
 import { api } from '../../services/api.ts';
+import { firestoreService } from '../../services/firestoreService.ts';
 import type {
   Student,
   StudentProgressSummary,
   ClassReport,
   AttendanceRecord,
+  Mentor,
 } from '../../types/index.ts';
 
 interface MentorDashboardProps {
@@ -33,7 +41,27 @@ export function MentorDashboard({ onNavigate }: MentorDashboardProps) {
   const [assignedStudents, setAssignedStudents] = useState<
     (Student & { parentName?: string; parentMobile?: string; summary: StudentProgressSummary })[]
   >([]);
+  const [mentorProfile, setMentorProfile] = useState<Mentor | null>(null);
+  const [activeTab, setActiveTab] = useState<'students' | 'profile'>('students');
   const [loading, setLoading] = useState(true);
+
+  // Profile Edit State
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [editForm, setEditForm] = useState({
+    fullName: '',
+    qualification: '',
+    college: '',
+    teachingExperience: '',
+    subjects: '',
+    classes: '',
+    teachingMode: 'Home Tuition',
+    district: '',
+    city: '',
+    preferredAreas: '',
+    expectedFee: '',
+    about: '',
+    mobile: '',
+  });
 
   // Modals state
   const [reportModalStudent, setReportModalStudent] = useState<Student | null>(null);
@@ -79,14 +107,71 @@ export function MentorDashboard({ onNavigate }: MentorDashboardProps) {
   async function loadMentorData() {
     setLoading(true);
     try {
-      const students = await api.getMentorAssignedStudents();
+      const [students, currentUser] = await Promise.all([
+        api.getMentorAssignedStudents().catch(() => []),
+        api.getCurrentUser().catch(() => null),
+      ]);
       setAssignedStudents(students);
+      if (currentUser?.profile) {
+        const prof = currentUser.profile as Mentor;
+        setMentorProfile(prof);
+        setEditForm({
+          fullName: prof.fullName || currentUser.user?.name || '',
+          qualification: prof.qualification || '',
+          college: prof.college || '',
+          teachingExperience: prof.teachingExperience || '',
+          subjects: Array.isArray(prof.subjects) ? prof.subjects.join(', ') : '',
+          classes: Array.isArray(prof.classes) ? prof.classes.join(', ') : '',
+          teachingMode: prof.teachingMode || 'Home Tuition',
+          district: prof.district || currentUser.user?.district || 'Patna',
+          city: prof.city || prof.district || 'Patna',
+          preferredAreas: Array.isArray(prof.preferredAreas) ? prof.preferredAreas.join(', ') : '',
+          expectedFee: prof.expectedFee || '₹3,500 - ₹5,000 / month',
+          about: prof.about || '',
+          mobile: prof.mobile || currentUser.user?.mobile || '',
+        });
+      }
     } catch (err) {
       console.error('Failed to load mentor students:', err);
     } finally {
       setLoading(false);
     }
   }
+
+  const handleSaveProfile = async (e: FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      const updated: Partial<Mentor> = {
+        fullName: editForm.fullName.trim(),
+        qualification: editForm.qualification.trim(),
+        college: editForm.college.trim(),
+        teachingExperience: editForm.teachingExperience.trim(),
+        subjects: editForm.subjects.split(',').map((s) => s.trim()).filter(Boolean),
+        classes: editForm.classes.split(',').map((s) => s.trim()).filter(Boolean),
+        teachingMode: editForm.teachingMode as any,
+        district: editForm.district.trim(),
+        city: editForm.city.trim() || editForm.district.trim(),
+        preferredAreas: editForm.preferredAreas.split(',').map((s) => s.trim()).filter(Boolean),
+        expectedFee: editForm.expectedFee.trim(),
+        about: editForm.about.trim(),
+        mobile: editForm.mobile.trim(),
+      };
+
+      if (user?.profileId || user?.id) {
+        await firestoreService.updateMentorProfile(user.profileId || user.id, updated);
+      }
+
+      setMentorProfile((prev) => (prev ? { ...prev, ...updated } : (updated as Mentor)));
+      setEditingProfile(false);
+      showToast('Mentor profile updated successfully on the website directory!');
+    } catch (err) {
+      console.error('Failed to update mentor profile:', err);
+      alert('Failed to update profile. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const showToast = (msg: string) => {
     setSuccessMessage(msg);
@@ -199,65 +284,403 @@ export function MentorDashboard({ onNavigate }: MentorDashboardProps) {
         )}
 
         {/* Mentor Profile Banner */}
-        <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-bold text-xl">
-              AK
-            </div>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                  Mentor Portal
-                </span>
-                <span className="text-xs text-slate-500">Verified Educator • NIT Patna</span>
+        {(() => {
+          const mentorName = mentorProfile?.fullName || user?.name || 'Mentor Educator';
+          const initials =
+            mentorName
+              .split(' ')
+              .filter(Boolean)
+              .map((n) => n[0])
+              .join('')
+              .slice(0, 2)
+              .toUpperCase() || 'ME';
+
+          return (
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-emerald-700 text-white flex items-center justify-center font-bold text-xl shadow-xs">
+                  {initials}
+                </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-700" />
+                      Verified Mentor
+                    </span>
+                    <span className="text-xs text-slate-500">
+                      {mentorProfile?.qualification || 'Verified Educator'} • {mentorProfile?.college || 'BBA Network'}
+                    </span>
+                  </div>
+                  <h1 className="text-2xl font-black text-slate-900 tracking-tight">{mentorName}</h1>
+                  <p className="text-xs text-slate-500">
+                    {Array.isArray(mentorProfile?.subjects)
+                      ? mentorProfile?.subjects.join(', ')
+                      : mentorProfile?.subjects || 'Mathematics & Science'}{' '}
+                    • {mentorProfile?.teachingExperience || '2+ Years Experience'} •{' '}
+                    {mentorProfile?.district || 'Patna'} & {mentorProfile?.teachingMode || 'Home Tuition'}
+                  </p>
+                </div>
               </div>
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight">
-                {user?.name || 'Er. Amit Kumar'}
-              </h1>
-              <p className="text-xs text-slate-500">
-                Mathematics & Science • 6+ Years Experience • Patna & Online
-              </p>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-4 text-xs">
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
-              <span className="text-slate-400 block text-[10px]">Assigned Students</span>
-              <span className="font-extrabold text-slate-900 text-base">{assignedStudents.length}</span>
+              <div className="flex items-center gap-3 text-xs">
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center min-w-[100px]">
+                  <span className="text-slate-400 block text-[10px] font-semibold">Assigned Students</span>
+                  <span className="font-extrabold text-slate-900 text-base">{assignedStudents.length}</span>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center min-w-[100px]">
+                  <span className="text-slate-400 block text-[10px] font-semibold">Mentor Rating</span>
+                  <span className="font-extrabold text-amber-600 text-base flex items-center gap-1 justify-center">
+                    <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                    {mentorProfile?.rating || 5.0}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 text-center">
-              <span className="text-slate-400 block text-[10px]">Mentor Rating</span>
-              <span className="font-extrabold text-amber-600 text-base flex items-center gap-1 justify-center">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                4.9
-              </span>
-            </div>
-          </div>
+          );
+        })()}
+
+        {/* Dashboard Tabs */}
+        <div className="flex items-center gap-2 border-b border-slate-200 pb-3">
+          <button
+            onClick={() => setActiveTab('students')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+              activeTab === 'students'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+            }`}
+          >
+            <Users className="w-4 h-4" />
+            <span>Assigned Students ({assignedStudents.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('profile')}
+            className={`px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 ${
+              activeTab === 'profile'
+                ? 'bg-emerald-800 text-white shadow-xs'
+                : 'bg-white text-slate-600 hover:text-slate-900 border border-slate-200'
+            }`}
+          >
+            <UserCheck className="w-4 h-4" />
+            <span>My Live Public Profile 👤</span>
+          </button>
         </div>
 
-        {/* Section Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-black text-slate-900">Your Assigned Home Tuition Students</h2>
-            <p className="text-xs text-slate-500">
-              Submit daily session logs, mark check-ins, and view weak topics diagnosed by BBA Mentors assessments.
-            </p>
-          </div>
-        </div>
+        {/* TAB 1: PROFILE TAB */}
+        {activeTab === 'profile' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-lg font-black text-slate-900">Mentor Profile & Website Presence</h2>
+                    <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                      Profile Active & Live
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500">
+                    Parents searching for home tutors in your district can see this profile in the BBA Mentor Directory.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setEditingProfile(!editingProfile)}
+                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>{editingProfile ? 'Cancel Editing' : 'Edit Profile'}</span>
+                  </button>
+                  <button
+                    onClick={() => onNavigate('find-mentor', { district: mentorProfile?.district || 'Patna' })}
+                    className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    <span>Find Mentors Page</span>
+                  </button>
+                </div>
+              </div>
 
-        {/* Assigned Students List */}
-        {loading ? (
-          <div className="py-20 text-center text-xs text-slate-500">Loading student rosters...</div>
-        ) : assignedStudents.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 space-y-2">
-            <p className="text-sm font-bold text-slate-700">No active students assigned yet.</p>
-            <p className="text-xs text-slate-500">
-              The BBA Mentors administration team will match pending tuition inquiries in your preferred areas.
-            </p>
+              {/* Edit Form or Read View */}
+              {editingProfile ? (
+                <form onSubmit={handleSaveProfile} className="space-y-4 pt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Full Name</label>
+                      <input
+                        type="text"
+                        value={editForm.fullName}
+                        onChange={(e) => setEditForm({ ...editForm, fullName: e.target.value })}
+                        required
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Mobile Number</label>
+                      <input
+                        type="tel"
+                        value={editForm.mobile}
+                        onChange={(e) => setEditForm({ ...editForm, mobile: e.target.value })}
+                        required
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Highest Qualification</label>
+                      <input
+                        type="text"
+                        value={editForm.qualification}
+                        onChange={(e) => setEditForm({ ...editForm, qualification: e.target.value })}
+                        required
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">College / University</label>
+                      <input
+                        type="text"
+                        value={editForm.college}
+                        onChange={(e) => setEditForm({ ...editForm, college: e.target.value })}
+                        required
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Teaching Experience</label>
+                      <input
+                        type="text"
+                        value={editForm.teachingExperience}
+                        onChange={(e) => setEditForm({ ...editForm, teachingExperience: e.target.value })}
+                        required
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Expected Fee / Month</label>
+                      <input
+                        type="text"
+                        value={editForm.expectedFee}
+                        onChange={(e) => setEditForm({ ...editForm, expectedFee: e.target.value })}
+                        required
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">District (Bihar)</label>
+                      <input
+                        type="text"
+                        value={editForm.district}
+                        onChange={(e) => setEditForm({ ...editForm, district: e.target.value })}
+                        required
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Preferred Localities / Areas</label>
+                      <input
+                        type="text"
+                        value={editForm.preferredAreas}
+                        onChange={(e) => setEditForm({ ...editForm, preferredAreas: e.target.value })}
+                        placeholder="e.g. Kankarbagh, Boring Road, Bailey Road"
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Subjects (Comma separated)</label>
+                      <input
+                        type="text"
+                        value={editForm.subjects}
+                        onChange={(e) => setEditForm({ ...editForm, subjects: e.target.value })}
+                        placeholder="Mathematics, Science, Physics"
+                        required
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1">Classes (Comma separated)</label>
+                      <input
+                        type="text"
+                        value={editForm.classes}
+                        onChange={(e) => setEditForm({ ...editForm, classes: e.target.value })}
+                        placeholder="Class 9, Class 10, Class 11"
+                        required
+                        className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1">Teaching Philosophy & Bio</label>
+                    <textarea
+                      rows={3}
+                      value={editForm.about}
+                      onChange={(e) => setEditForm({ ...editForm, about: e.target.value })}
+                      className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setEditingProfile(false)}
+                      className="px-4 py-2 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold hover:bg-slate-50 transition"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={submitting}
+                      className="px-5 py-2 bg-emerald-700 text-white rounded-xl text-xs font-bold hover:bg-emerald-800 transition"
+                    >
+                      {submitting ? 'Saving...' : 'Save Profile Changes'}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-slate-400">Teaching Profile</span>
+                      <p className="text-sm font-black text-slate-900">
+                        {mentorProfile?.fullName || user?.name}
+                      </p>
+                      <p className="text-xs text-slate-600">
+                        {mentorProfile?.qualification || 'Graduate'} • {mentorProfile?.college || 'University'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-slate-400">Subjects Specialization</span>
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {(Array.isArray(mentorProfile?.subjects) ? mentorProfile?.subjects : ['Mathematics', 'Science']).map(
+                          (s, idx) => (
+                            <span
+                              key={idx}
+                              className="px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-50 text-blue-900 border border-blue-100"
+                            >
+                              {s}
+                            </span>
+                          )
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-slate-400">Target Classes & Boards</span>
+                      <p className="text-xs text-slate-700 font-semibold">
+                        Classes:{' '}
+                        {Array.isArray(mentorProfile?.classes)
+                          ? mentorProfile?.classes.join(', ')
+                          : mentorProfile?.classes || 'Class 9, Class 10'}
+                      </p>
+                      <p className="text-xs text-slate-700 font-semibold">
+                        Boards:{' '}
+                        {Array.isArray(mentorProfile?.boards)
+                          ? mentorProfile?.boards.join(', ')
+                          : mentorProfile?.boards || 'CBSE, BSEB'}
+                      </p>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-slate-400">Teaching Philosophy</span>
+                      <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        {mentorProfile?.about ||
+                          'Dedicated educator focused on building student confidence and rigorous problem solving.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-slate-400">Contact & Verification</span>
+                      <div className="text-xs space-y-1.5 text-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Mail className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{user?.email || mentorProfile?.email}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Phone className="w-3.5 h-3.5 text-slate-400" />
+                          <span>{mentorProfile?.mobile || user?.mobile || 'Not set'}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-slate-400">Location & Coverage</span>
+                      <div className="flex items-start gap-2 text-xs text-slate-700">
+                        <MapPin className="w-3.5 h-3.5 text-slate-400 mt-0.5" />
+                        <div>
+                          <p className="font-bold text-slate-900">
+                            {mentorProfile?.district || user?.district || 'Patna'}, Bihar
+                          </p>
+                          <p className="text-slate-500 text-[11px]">
+                            Preferred Areas:{' '}
+                            {Array.isArray(mentorProfile?.preferredAreas)
+                              ? mentorProfile?.preferredAreas.join(', ')
+                              : mentorProfile?.preferredAreas || mentorProfile?.district || 'Patna'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <span className="text-[10px] uppercase font-bold text-slate-400">Teaching Mode & Fee</span>
+                      <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-xs space-y-1">
+                        <div className="flex justify-between">
+                          <span className="text-emerald-900 font-semibold">Mode:</span>
+                          <span className="font-bold text-emerald-950">
+                            {mentorProfile?.teachingMode || 'Home Tuition'}
+                          </span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-emerald-900 font-semibold">Expected Fee:</span>
+                          <span className="font-bold text-emerald-950">
+                            {mentorProfile?.expectedFee || '₹3,500 - ₹5,000 / month'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            {assignedStudents.map((student) => (
+        )}
+
+        {/* TAB 2: STUDENTS TAB */}
+        {activeTab === 'students' && (
+          <>
+            {/* Section Header */}
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-black text-slate-900">Your Assigned Home Tuition Students</h2>
+                <p className="text-xs text-slate-500">
+                  Submit daily session logs, mark check-ins, and view weak topics diagnosed by BBA Mentors assessments.
+                </p>
+              </div>
+            </div>
+
+            {/* Assigned Students List */}
+            {loading ? (
+              <div className="py-20 text-center text-xs text-slate-500">Loading student rosters...</div>
+            ) : assignedStudents.length === 0 ? (
+              <div className="p-12 text-center bg-white rounded-2xl border border-slate-200 space-y-3">
+                <ShieldCheck className="w-10 h-10 text-emerald-600 mx-auto" />
+                <p className="text-sm font-bold text-slate-800">Your Mentor Profile Is Active On The Website!</p>
+                <p className="text-xs text-slate-500 max-w-md mx-auto">
+                  Your registered profile is now visible to parents seeking verified tutors in {mentorProfile?.district || 'Bihar'}.
+                  Once a parent books home tuition in your preferred areas, you will receive assignments here.
+                </p>
+                <div className="pt-2">
+                  <button
+                    onClick={() => setActiveTab('profile')}
+                    className="px-4 py-2 bg-emerald-800 text-white rounded-xl text-xs font-bold hover:bg-emerald-900 transition"
+                  >
+                    View & Edit My Profile
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {assignedStudents.map((student) => (
               <div
                 key={student.id}
                 className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col lg:flex-row justify-between gap-6"
@@ -361,6 +784,8 @@ export function MentorDashboard({ onNavigate }: MentorDashboardProps) {
               </div>
             ))}
           </div>
+        )}
+          </>
         )}
       </div>
 

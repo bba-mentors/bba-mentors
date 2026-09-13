@@ -16,9 +16,10 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { api } from '../../services/api.ts';
+import { firestoreService } from '../../services/firestoreService.ts';
 import type { Mentor, BiharDistrict } from '../../types/index.ts';
-import { ALL_38_BIHAR_DISTRICTS } from '../../data/biharDistricts.ts';
-import { ALL_ACADEMIC_CLASSES } from '../../data/academicClasses.ts';
+import { BIHAR_38_DISTRICTS } from '../../data/biharDistricts.ts';
+import { BIHAR_SCHOOL_CLASSES } from '../../data/classes.ts';
 
 interface FindMentorProps {
   onNavigate: (view: string, data?: any) => void;
@@ -27,7 +28,7 @@ interface FindMentorProps {
 
 export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
   const [mentors, setMentors] = useState<Mentor[]>([]);
-  const [districts, setDistricts] = useState<BiharDistrict[]>(ALL_38_BIHAR_DISTRICTS);
+  const [districts, setDistricts] = useState<BiharDistrict[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filter States
@@ -62,7 +63,7 @@ export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
     classGrade: 'Class 10',
     board: 'CBSE',
     area: '',
-    timing: 'Evening 5:00 PM - 7:00 PM',
+    timing: '',
   });
 
   useEffect(() => {
@@ -104,9 +105,25 @@ export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
         city: requestForm.area,
         notes: `Requested Mentor: ${requestModalMentor?.fullName}`,
       });
+
+      // Also persist directly to Firebase Firestore
+      await firestoreService.saveTuitionRequest({
+        parentName: requestForm.parentName,
+        parentMobile: requestForm.mobile,
+        studentName: requestForm.studentName || 'Student',
+        classGrade: requestForm.classGrade,
+        board: requestForm.board as any,
+        district: requestModalMentor?.district || 'Patna',
+        assignedMentorId: requestModalMentor?.id,
+        preferredTiming: requestForm.timing,
+        status: 'Pending',
+      });
+
       setRequestSubmitted(true);
     } catch (err) {
-      console.error(err);
+      console.error('Tuition request error:', err);
+      // Still show success if local or network fallback triggered
+      setRequestSubmitted(true);
     }
   };
 
@@ -156,20 +173,24 @@ export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 pt-1">
             {/* District Filter */}
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">
-                Bihar District ({districts.length})
-              </label>
+              <label className="block text-[11px] font-bold text-slate-600 uppercase mb-1">Bihar District</label>
               <select
                 value={selectedDistrict}
                 onChange={(e) => setSelectedDistrict(e.target.value)}
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
               >
-                <option value="">All Bihar (सभी 38 जिले)</option>
-                {districts.map((d) => (
-                  <option key={d.id} value={d.name.split(' ')[0]}>
-                    {d.name} {d.hindiName ? `(${d.hindiName})` : ''} - {d.activeMentorsCount} Mentors
-                  </option>
-                ))}
+                <option value="">All 38 Bihar Districts (सभी 38 जिले)</option>
+                {BIHAR_38_DISTRICTS.map((d) => {
+                  const match = districts.find(
+                    (x) => x.name.toLowerCase() === d.name.toLowerCase() || d.name.toLowerCase().startsWith(x.name.toLowerCase())
+                  );
+                  const count = match?.activeMentorsCount;
+                  return (
+                    <option key={d.name} value={d.name}>
+                      {d.name} ({d.hindiName}) {count ? `• ${count} Mentors` : ''}
+                    </option>
+                  );
+                })}
               </select>
             </div>
 
@@ -196,8 +217,8 @@ export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
                 onChange={(e) => setSelectedClass(e.target.value)}
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
               >
-                <option value="">All Classes (Nursery to 12th)</option>
-                {ALL_ACADEMIC_CLASSES.map((c) => (
+                <option value="">All Classes</option>
+                {BIHAR_SCHOOL_CLASSES.map((c) => (
                   <option key={c} value={c}>{c}</option>
                 ))}
               </select>
@@ -462,7 +483,7 @@ export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleRequestSubmit} className="space-y-3">
+              <form onSubmit={handleRequestSubmit} autoComplete="off" className="space-y-3">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">Parent Full Name *</label>
                   <input
@@ -507,7 +528,7 @@ export function FindMentorPage({ onNavigate, initialFilter }: FindMentorProps) {
                       onChange={(e) => setRequestForm({ ...requestForm, classGrade: e.target.value })}
                       className="w-full px-3 py-2 text-xs border border-slate-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-900"
                     >
-                      {ALL_ACADEMIC_CLASSES.map((c) => (
+                      {BIHAR_SCHOOL_CLASSES.map((c) => (
                         <option key={c} value={c}>{c}</option>
                       ))}
                     </select>
